@@ -1,10 +1,13 @@
 import { get } from './client';
-import type { Armor, Talisman, Weapon, Shield } from '$lib/types';
+import type { Armor, Talisman, Weapon, Shield, Sorcery, Incantation, Spirit } from '$lib/types';
 
 let armorCache: Armor[] | null = null;
 let talismanCache: Talisman[] | null = null;
 let weaponCache: Weapon[] | null = null;
 let shieldCache: Shield[] | null = null;
+let sorceryCache: Sorcery[] | null = null;
+let incantationCache: Incantation[] | null = null;
+let spiritCache: Spirit[] | null = null;
 
 export async function fetchArmors(): Promise<Armor[]> {
 	if (armorCache) return armorCache;
@@ -30,12 +33,34 @@ export async function fetchShields(): Promise<Shield[]> {
 	return shieldCache;
 }
 
+export async function fetchSorceries(): Promise<Sorcery[]> {
+	if (sorceryCache) return sorceryCache;
+	sorceryCache = await get<Sorcery[]>('/sorceries');
+	return sorceryCache;
+}
+
+export async function fetchIncantations(): Promise<Incantation[]> {
+	if (incantationCache) return incantationCache;
+	incantationCache = await get<Incantation[]>('/incantations');
+	return incantationCache;
+}
+
+export async function fetchSpirits(): Promise<Spirit[]> {
+	if (spiritCache) return spiritCache;
+	spiritCache = await get<Spirit[]>('/spirits');
+	return spiritCache;
+}
+
 export async function loadAllItems() {
-	const [armors, talismans, weapons, shields] = await Promise.all([
-		fetchArmors(),
-		fetchTalismans(),
-		fetchWeapons(),
-		fetchShields()
-	]);
-	return { armors, talismans, weapons, shields };
+	const [armors, talismans, weapons, shields, sorceries, incantations, spirits] =
+		await Promise.all([
+			fetchArmors(),
+			fetchTalismans(),
+			fetchWeapons(),
+			fetchShields(),
+			fetchSorceries(),
+			fetchIncantations(),
+			fetchSpirits()
+		]);
+	return { armors, talismans, weapons, shields, sorceries, incantations, spirits };
 }
