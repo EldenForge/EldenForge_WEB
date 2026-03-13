@@ -104,4 +104,5 @@ export interface BuildState {
 	};
 	spells: (Spell | null)[];
 	spirit: Spirit | null;
+	guide: string;
 }

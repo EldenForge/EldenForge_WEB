@@ -17,6 +17,7 @@
 	import EquipmentFrame from '$lib/components/EquipmentFrame.svelte';
 	import SpellGrid from '$lib/components/SpellGrid.svelte';
 	import ItemPicker from '$lib/components/ItemPicker.svelte';
+	import GuideEditor from '$lib/components/GuideEditor.svelte';
 
 	// ── Data ──
 	let armors = $state<Armor[]>([]);
@@ -40,6 +41,13 @@
 	);
 	let allSpells = $derived(
 		[...sorceries, ...incantations].sort((a, b) => a.name.localeCompare(b.name))
+	);
+
+	// All items for guide pings
+	let allGuideItems = $derived(
+		[...weapons, ...shields, ...armors, ...talismans, ...sorceries, ...incantations, ...spirits].sort(
+			(a, b) => a.name.localeCompare(b.name)
+		)
 	);
 
 	// ── Picker state ──
@@ -280,6 +288,15 @@
 						spirit={$buildStore.spirit}
 						onspellclick={handleSpellClick}
 						onspiritclick={handleSpiritClick}
+					/>
+				</section>
+				<!-- Guide -->
+				<section class="card">
+					<h2 class="section-title">Guide</h2>
+					<GuideEditor
+						guide={$buildStore.guide}
+						allItems={allGuideItems}
+						onchange={(text) => buildStore.setGuide(text)}
 					/>
 				</section>
 			</div>

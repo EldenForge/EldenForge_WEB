@@ -17,7 +17,8 @@ function getInitialState(): BuildState {
 		talismans: [null, null, null, null],
 		weapons: { right: null, left: null },
 		spells: [null, null, null, null, null, null, null, null, null, null],
-		spirit: null
+		spirit: null,
+		guide: ''
 	};
 }
 
@@ -45,6 +46,7 @@ function createBuildStore() {
 				return { ...s, spells };
 			}),
 		setSpirit: (item: Spirit | null) => update((s) => ({ ...s, spirit: item })),
+		setGuide: (text: string) => update((s) => ({ ...s, guide: text })),
 		reset: () => set(getInitialState())
 	};
 }
