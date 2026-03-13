@@ -1,12 +1,15 @@
 <script lang="ts">
+	import { tooltipStore, type AnyItem } from '$lib/stores/tooltip';
+
 	interface Props {
 		slotLabel: string;
 		itemName?: string | null;
 		itemImage?: string | null;
+		itemData?: AnyItem | null;
 		size?: 'sm' | 'md' | 'lg';
 		onclick?: () => void;
 	}
-	let { slotLabel, itemName = null, itemImage = null, size = 'md', onclick }: Props = $props();
+	let { slotLabel, itemName = null, itemImage = null, itemData = null, size = 'md', onclick }: Props = $props();
 
 	const sizes: Record<string, string> = {
 		sm: 'w-14 h-14',
@@ -23,7 +26,14 @@
 	});
 </script>
 
-<button class="flex flex-col items-center gap-1 group cursor-pointer" type="button" {onclick}>
+<button
+	class="flex flex-col items-center gap-1 group cursor-pointer"
+	type="button"
+	{onclick}
+	onmouseenter={(e) => { if (itemData) tooltipStore.show(itemData, e.clientX, e.clientY); }}
+	onmousemove={(e) => { if (itemData) tooltipStore.move(e.clientX, e.clientY); }}
+	onmouseleave={() => tooltipStore.hide()}
+>
 	<div
 		class="{sizes[size]} rounded-lg border-2 overflow-hidden flex items-center justify-center
 			transition-all duration-200

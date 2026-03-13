@@ -1,9 +1,7 @@
 <script lang="ts">
-	interface ItemRef {
-		id: string;
-		name: string;
-		image?: string | null;
-	}
+	import { tooltipStore, type AnyItem } from '$lib/stores/tooltip';
+
+	type ItemRef = AnyItem & { id: string };
 
 	interface Props {
 		guide: string;
@@ -124,6 +122,10 @@
 	function textToLines(text: string): string[] {
 		return text.split('\n');
 	}
+
+	function fextralife(name: string): string {
+		return 'https://eldenring.wiki.fextralife.com/' + name.trim().replace(/ /g, '+');
+	}
 </script>
 
 <div class="space-y-3">
@@ -224,10 +226,17 @@
 						{#if seg.type === 'text'}
 							{seg.content}
 						{:else if seg.item}
-							<!-- Known item chip -->
-							<span
+							<!-- Known item chip — links to Fextralife wiki -->
+							<a
+								href={fextralife(seg.item.name)}
+								target="_blank"
+								rel="noopener noreferrer"
 								class="inline-flex items-center gap-1 bg-dark-700 border border-gold/30
-									rounded px-1.5 py-0.5 mx-0.5 align-middle"
+									rounded px-1.5 py-0.5 mx-0.5 align-middle
+									hover:border-gold hover:bg-dark-600 transition-colors cursor-pointer"
+								onmouseenter={(e) => tooltipStore.show(seg.item!, e.clientX, e.clientY)}
+								onmousemove={(e) => tooltipStore.move(e.clientX, e.clientY)}
+								onmouseleave={() => tooltipStore.hide()}
 							>
 								{#if seg.item.image}
 									<img
@@ -239,10 +248,13 @@
 										}}
 									/>
 								{/if}
-								<span class="text-gold text-[11px] font-cinzel leading-none"
-									>{seg.item.name}</span
-								>
-							</span>
+								<span class="text-gold text-[11px] font-cinzel leading-none">{seg.item.name}</span>
+								<svg class="w-2.5 h-2.5 text-gold/40 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+									<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+									<polyline points="15 3 21 3 21 9" />
+									<line x1="10" y1="14" x2="21" y2="3" />
+								</svg>
+							</a>
 						{:else}
 							<!-- Unknown item — show as plain bracketed text -->
 							<span class="text-parchment/40">[{seg.content}]</span>

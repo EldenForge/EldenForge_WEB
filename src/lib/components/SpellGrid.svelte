@@ -18,6 +18,7 @@
 			slotLabel="Spell {i + 1}"
 			itemName={spell?.name}
 			itemImage={spell?.image}
+			itemData={spell}
 			size="sm"
 			onclick={() => onspellclick(i)}
 		/>
@@ -30,6 +31,7 @@
 		slotLabel="Spirit Ashes"
 		itemName={spirit?.name}
 		itemImage={spirit?.image}
+		itemData={spirit}
 		size="md"
 		onclick={onspiritclick}
 	/>

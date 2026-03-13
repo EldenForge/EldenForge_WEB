@@ -18,6 +18,7 @@
 			slotLabel="Head"
 			itemName={armor.head?.name}
 			itemImage={armor.head?.image}
+			itemData={armor.head}
 			size="lg"
 			onclick={() => onslotclick('armor', 'head')}
 		/>
@@ -27,6 +28,7 @@
 			slotLabel="Left Hand"
 			itemName={weapons.left?.name}
 			itemImage={weapons.left?.image}
+			itemData={weapons.left}
 			size="lg"
 			onclick={() => onslotclick('weapon', 'left')}
 		/>
@@ -36,6 +38,7 @@
 			slotLabel="Chest"
 			itemName={armor.chest?.name}
 			itemImage={armor.chest?.image}
+			itemData={armor.chest}
 			size="lg"
 			onclick={() => onslotclick('armor', 'chest')}
 		/>
@@ -45,6 +48,7 @@
 			slotLabel="Right Hand"
 			itemName={weapons.right?.name}
 			itemImage={weapons.right?.image}
+			itemData={weapons.right}
 			size="lg"
 			onclick={() => onslotclick('weapon', 'right')}
 		/>
@@ -54,6 +58,7 @@
 			slotLabel="Hands"
 			itemName={armor.hands?.name}
 			itemImage={armor.hands?.image}
+			itemData={armor.hands}
 			size="lg"
 			onclick={() => onslotclick('armor', 'hands')}
 		/>
@@ -63,6 +68,7 @@
 			slotLabel="Legs"
 			itemName={armor.legs?.name}
 			itemImage={armor.legs?.image}
+			itemData={armor.legs}
 			size="lg"
 			onclick={() => onslotclick('armor', 'legs')}
 		/>
@@ -76,6 +82,7 @@
 			slotLabel="Talisman {i + 1}"
 			itemName={talismans[i]?.name}
 			itemImage={talismans[i]?.image}
+			itemData={talismans[i]}
 			size="md"
 			onclick={() => onslotclick('talisman', String(i))}
 		/>

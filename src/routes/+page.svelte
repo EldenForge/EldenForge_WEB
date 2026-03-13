@@ -209,7 +209,8 @@
 					left: b.weapons.left?.name ?? null
 				},
 				spells: b.spells.filter((s) => s !== null).map((s) => s!.name),
-				spirit: b.spirit?.name ?? null
+				spirit: b.spirit?.name ?? null,
+				guide: b.guide || null
 			},
 			null,
 			2
