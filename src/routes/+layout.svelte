@@ -19,6 +19,15 @@
 			Build
 		</a>
 		<a
+			href="/items"
+			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
+				{$page.url.pathname === '/items'
+				? 'text-gold bg-gold/10 border border-gold/30'
+				: 'text-parchment/50 hover:text-parchment/80'}"
+		>
+			Items
+		</a>
+		<a
 			href="/map"
 			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
 				{$page.url.pathname === '/map'
