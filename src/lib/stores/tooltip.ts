@@ -1,6 +1,11 @@
 import { writable } from 'svelte/store';
 
-export type AnyItem = Record<string, unknown> & { name: string; image?: string | null };
+export interface AnyItem {
+	id?: string;
+	name: string;
+	image?: string | null;
+	[key: string]: unknown;
+}
 
 interface TooltipState {
 	visible: boolean;

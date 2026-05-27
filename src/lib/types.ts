@@ -17,6 +17,7 @@ export interface Armor {
 	dmgNegation: StatEntry[];
 	resistance: StatEntry[];
 	weight: number;
+	[key: string]: unknown;
 }
 
 export interface Talisman {
@@ -25,6 +26,7 @@ export interface Talisman {
 	image: string;
 	description: string;
 	effect: string;
+	[key: string]: unknown;
 }
 
 export interface Weapon {
@@ -38,6 +40,7 @@ export interface Weapon {
 	requiredAttributes: StatEntry[];
 	category: string;
 	weight: number;
+	[key: string]: unknown;
 }
 
 export type Shield = Weapon;
@@ -52,6 +55,7 @@ export interface Sorcery {
 	slots: number;
 	effects: string;
 	requires: StatEntry[];
+	[key: string]: unknown;
 }
 
 export interface Incantation {
@@ -64,6 +68,7 @@ export interface Incantation {
 	slots: number;
 	effects: string;
 	requires: StatEntry[];
+	[key: string]: unknown;
 }
 
 export type Spell = Sorcery | Incantation;
@@ -76,6 +81,7 @@ export interface Spirit {
 	fpCost: number;
 	hpCost: number;
 	effect: string;
+	[key: string]: unknown;
 }
 
 export interface CharacterStats {

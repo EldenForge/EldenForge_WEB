@@ -18,6 +18,13 @@
 	import SpellGrid from '$lib/components/SpellGrid.svelte';
 	import ItemPicker from '$lib/components/ItemPicker.svelte';
 	import GuideEditor from '$lib/components/GuideEditor.svelte';
+	import { authStore } from '$lib/stores/auth';
+	import AuthModal from '$lib/components/AuthModal.svelte';
+	import SaveBuildModal from '$lib/components/SaveBuildModal.svelte';
+	import { serializeBuild, deserializeBuild, type BuildPayload } from '$lib/builds/serialize';
+	import { getBuild } from '$lib/api/builds';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	// ── Data ──
 	let armors = $state<Armor[]>([]);
@@ -30,6 +37,19 @@
 	let loading = $state(true);
 	let error = $state('');
 	let copied = $state(false);
+	let saveModalOpen = $state(false);
+	let authModalOpen = $state(false);
+	let savePayload = $state<BuildPayload>({
+		stats: { vigor: 10, mind: 10, endurance: 10, strength: 10, dexterity: 10, intelligence: 10, faith: 10, arcane: 10 },
+		armor: { head: null, chest: null, hands: null, legs: null },
+		talismans: [null, null, null, null],
+		weapons: { right: null, left: null },
+		spells: [null, null, null, null, null, null, null, null, null, null],
+		spirit: null,
+		guide: ''
+	});
+	let loadedBuildId = $state<string | null>(null);
+	let loadedBuildMeta = $state<{ name: string; description: string | null; is_public: boolean } | null>(null);
 
 	// ── Derived item lists ──
 	let headArmors = $derived(armors.filter((a) => a.category === 'Helm'));
@@ -189,6 +209,58 @@
 		} finally {
 			loading = false;
 		}
+	});
+
+	// ── Save build ──
+	function openSave() {
+		savePayload = serializeBuild($buildStore);
+		if (!$authStore.user) {
+			authModalOpen = true;
+			return;
+		}
+		saveModalOpen = true;
+	}
+
+	function onAuthSuccess() {
+		// after login success, open save modal immediately
+		saveModalOpen = true;
+	}
+
+	let saved = $state(false);
+
+	function onBuildSaved(id: string) {
+		loadedBuildId = id;
+		saved = true;
+		setTimeout(() => (saved = false), 2000);
+	}
+
+	// ── Load build from query param ──
+	$effect(() => {
+		const buildIdParam = $page.url.searchParams.get('build');
+		if (!buildIdParam || loading) return;
+		if (loadedBuildId === buildIdParam) return; // already loaded
+
+		(async () => {
+			try {
+				const b = await getBuild(buildIdParam);
+				const state = deserializeBuild(b.data as unknown as BuildPayload, {
+					armors,
+					talismans,
+					weapons,
+					shields,
+					sorceries,
+					incantations,
+					spirits
+				});
+				buildStore.setAll(state);
+				loadedBuildId = b.id;
+				loadedBuildMeta = { name: b.name, description: b.description, is_public: b.is_public };
+			} catch (e) {
+				console.error('Failed to load build', e);
+				// Strip the param so we don't keep retrying
+				goto('/', { replaceState: true });
+			}
+		})();
 	});
 
 	// ── Export build ──
@@ -509,6 +581,15 @@
 						<button class="btn-reset flex-1" onclick={() => buildStore.reset()}>
 							Reset
 						</button>
+						<button class="btn-gold flex-1" onclick={openSave} disabled={!hasBuild}>
+							{#if saved}
+								Saved!
+							{:else if loadedBuildId}
+								Update
+							{:else}
+								Save
+							{/if}
+						</button>
 						<button class="btn-gold flex-1" onclick={copyBuild} disabled={!hasBuild}>
 							{copied ? 'Copied!' : 'Copy JSON'}
 						</button>
@@ -527,5 +608,24 @@
 		onselect={(item) => pickerAction(item)}
 		onclear={() => pickerAction(null)}
 		onclose={closePicker}
+	/>
+
+	<!-- Auth Modal (re-opens save after login) -->
+	<AuthModal
+		open={authModalOpen}
+		onclose={() => (authModalOpen = false)}
+		onsuccess={onAuthSuccess}
+	/>
+
+	<!-- Save Build Modal -->
+	<SaveBuildModal
+		open={saveModalOpen}
+		payload={savePayload}
+		existingBuildId={loadedBuildId}
+		existingName={loadedBuildMeta?.name ?? ''}
+		existingDescription={loadedBuildMeta?.description ?? ''}
+		existingIsPublic={loadedBuildMeta?.is_public ?? false}
+		onclose={() => (saveModalOpen = false)}
+		onsaved={onBuildSaved}
 	/>
 {/if}

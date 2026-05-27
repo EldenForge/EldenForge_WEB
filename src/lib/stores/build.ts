@@ -47,6 +47,7 @@ function createBuildStore() {
 			}),
 		setSpirit: (item: Spirit | null) => update((s) => ({ ...s, spirit: item })),
 		setGuide: (text: string) => update((s) => ({ ...s, guide: text })),
+		setAll: (state: BuildState) => set(state),
 		reset: () => set(getInitialState())
 	};
 }
