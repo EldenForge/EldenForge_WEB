@@ -8,6 +8,8 @@
 	import { ApiError } from '$lib/api/auth';
 	import { loadAllItems } from '$lib/api/items';
 	import GuideView from '$lib/components/GuideView.svelte';
+	import BuildSummary from '$lib/components/BuildSummary.svelte';
+	import { deserializeBuild, type BuildPayload } from '$lib/builds/serialize';
 	import type { AnyItem } from '$lib/stores/tooltip';
 
 	let build = $state<PublicBuildOut | null>(null);
@@ -18,8 +20,13 @@
 	let likeCount = $state(0);
 	let likePending = $state(false);
 	let guideItems = $state<(AnyItem & { id: string })[]>([]);
+	let lookups = $state<Awaited<ReturnType<typeof loadAllItems>> | null>(null);
 
 	const id = $derived($page.params.id as string);
+
+	const buildState = $derived(
+		build && lookups ? deserializeBuild(build.data as unknown as BuildPayload, lookups) : null
+	);
 
 	// Pseudos are unique, so this reliably identifies ownership without depending
 	// on the (possibly expired) access-token cookie used by optional auth.
@@ -94,6 +101,7 @@
 		// Load item data so [Item] references in the guide render as chips.
 		loadAllItems()
 			.then((d) => {
+				lookups = d;
 				guideItems = [
 					...d.weapons, ...d.shields, ...d.armors, ...d.talismans,
 					...d.sorceries, ...d.incantations, ...d.spirits
@@ -173,6 +181,13 @@
 						</div>
 					{/each}
 				</div>
+			</section>
+		{/if}
+
+		{#if buildState}
+			<section class="card mb-4">
+				<h2 class="section-title">Equipment</h2>
+				<BuildSummary build={buildState} />
 			</section>
 		{/if}
 
