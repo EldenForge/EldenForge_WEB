@@ -2,7 +2,7 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { getPublicBuild, forkBuild, likeBuild, unlikeBuild, type PublicBuildOut } from '$lib/api/builds';
+	import { getPublicBuild, forkBuild, likeBuild, unlikeBuild, deleteBuild, type PublicBuildOut } from '$lib/api/builds';
 	import { authStore } from '$lib/stores/auth';
 	import { openLoginModal } from '$lib/stores/ui';
 	import { ApiError } from '$lib/api/auth';
@@ -93,6 +93,21 @@
 		}
 	}
 
+	let deleting = $state(false);
+
+	async function handleDelete() {
+		if (!build || !isMine) return;
+		if (!confirm('Delete this build permanently? This cannot be undone.')) return;
+		deleting = true;
+		try {
+			await deleteBuild(id);
+			goto('/builds');
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Delete failed';
+			deleting = false;
+		}
+	}
+
 	const stats = $derived(build?.data?.stats as Record<string, number> | undefined);
 	const guide = $derived(build?.data?.guide as string | undefined);
 
@@ -161,6 +176,16 @@
 			<button class="btn-gold" onclick={handleModify} disabled={working}>
 				{working ? '...' : 'Modify'}
 			</button>
+			{#if isMine}
+				<button
+					type="button"
+					class="btn-reset hover:!text-red-400 hover:!border-red-400/40"
+					onclick={handleDelete}
+					disabled={deleting}
+				>
+					{deleting ? '...' : 'Delete'}
+				</button>
+			{/if}
 		</div>
 
 		{#if build.description}
