@@ -104,7 +104,7 @@
 					</div>
 
 					<div class="flex flex-col gap-2 shrink-0">
-						<a href="/?build={b.id}" class="btn-gold text-xs px-3 py-1.5">Load</a>
+						<a href="/build?build={b.id}" class="btn-gold text-xs px-3 py-1.5">Load</a>
 						<button
 							class="btn-reset text-xs px-3 py-1.5 hover:!text-red-400 hover:!border-red-400/30"
 							onclick={() => handleDelete(b.id)}
