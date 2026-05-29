@@ -6,20 +6,19 @@
 	import UserMenu from '$lib/components/UserMenu.svelte';
 	import AuthModal from '$lib/components/AuthModal.svelte';
 	import { authStore } from '$lib/stores/auth';
+	import { authModalOpen } from '$lib/stores/ui';
 
 	let { children } = $props();
-
-	let authModalOpen = $state(false);
 
 	onMount(() => {
 		authStore.bootstrap();
 	});
 
 	function openLogin() {
-		authModalOpen = true;
+		authModalOpen.set(true);
 	}
 	function closeAuthModal() {
-		authModalOpen = false;
+		authModalOpen.set(false);
 	}
 </script>
 
@@ -74,4 +73,4 @@
 
 <ItemTooltip />
 
-<AuthModal open={authModalOpen} onclose={closeAuthModal} />
+<AuthModal open={$authModalOpen} onclose={closeAuthModal} />

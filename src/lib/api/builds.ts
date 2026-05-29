@@ -80,7 +80,13 @@ export interface PublicBuildOut {
 	updated_at: string;
 	author_pseudo: string;
 	liked_by_me: boolean;
+	is_mine: boolean;
 	forked_from: ForkedFromInfo | null;
+}
+
+export interface LikeStatus {
+	liked: boolean;
+	like_count: number;
 }
 
 export interface ListPublicParams {
@@ -107,4 +113,12 @@ export async function getPublicBuild(id: string): Promise<PublicBuildOut> {
 
 export async function forkBuild(id: string): Promise<BuildOut> {
 	return post<BuildOut>(`/builds/${id}/fork`);
+}
+
+export async function likeBuild(id: string): Promise<LikeStatus> {
+	return post<LikeStatus>(`/public/builds/${id}/like`);
+}
+
+export async function unlikeBuild(id: string): Promise<LikeStatus> {
+	return del<LikeStatus>(`/public/builds/${id}/like`);
 }

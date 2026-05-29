@@ -2,14 +2,18 @@
 	import { page } from '$app/stores';
 	import { onMount } from 'svelte';
 	import { goto } from '$app/navigation';
-	import { getPublicBuild, forkBuild, type PublicBuildOut } from '$lib/api/builds';
+	import { getPublicBuild, forkBuild, likeBuild, unlikeBuild, type PublicBuildOut } from '$lib/api/builds';
 	import { authStore } from '$lib/stores/auth';
+	import { openLoginModal } from '$lib/stores/ui';
 	import { ApiError } from '$lib/api/auth';
 
 	let build = $state<PublicBuildOut | null>(null);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
-	let forking = $state(false);
+	let working = $state(false);
+	let liked = $state(false);
+	let likeCount = $state(0);
+	let likePending = $state(false);
 
 	const id = $derived($page.params.id as string);
 
@@ -18,6 +22,8 @@
 		error = null;
 		try {
 			build = await getPublicBuild(id);
+			liked = build.liked_by_me;
+			likeCount = build.like_count;
 		} catch (e) {
 			if (e instanceof ApiError && e.status === 404) error = 'Build not found';
 			else error = e instanceof Error ? e.message : 'Failed to load';
@@ -26,19 +32,47 @@
 		}
 	}
 
-	async function handleFork() {
+	async function toggleLike() {
 		if (!$authStore.user) {
-			error = 'Log in to copy this build';
+			openLoginModal();
 			return;
 		}
-		forking = true;
+		if (likePending) return;
+		likePending = true;
+		const wasLiked = liked;
+		const origCount = likeCount;
+		liked = !wasLiked;
+		likeCount = origCount + (liked ? 1 : -1);
+		try {
+			const res = wasLiked ? await unlikeBuild(id) : await likeBuild(id);
+			liked = res.liked;
+			likeCount = res.like_count;
+		} catch {
+			liked = wasLiked;
+			likeCount = origCount;
+		} finally {
+			likePending = false;
+		}
+	}
+
+	async function handleModify() {
+		if (!build) return;
+		if (!$authStore.user) {
+			openLoginModal();
+			return;
+		}
+		if (build.is_mine) {
+			goto(`/build?build=${build.id}`);
+			return;
+		}
+		working = true;
 		try {
 			const fork = await forkBuild(id);
 			goto(`/build?build=${fork.id}`);
 		} catch (e) {
-			error = e instanceof Error ? e.message : 'Fork failed';
+			error = e instanceof Error ? e.message : 'Action failed';
 		} finally {
-			forking = false;
+			working = false;
 		}
 	}
 
@@ -81,9 +115,22 @@
 		</header>
 
 		<div class="flex items-center gap-3 mb-6">
-			<span class="text-parchment/50 text-sm">&#10084; {build.like_count}</span>
-			<button class="btn-gold" onclick={handleFork} disabled={forking}>
-				{forking ? '...' : 'Copy to my builds'}
+			<button
+				type="button"
+				onclick={toggleLike}
+				disabled={likePending}
+				aria-label={liked ? 'Unlike' : 'Like'}
+				class="flex items-center gap-1.5 px-3 py-1.5 rounded border transition-colors disabled:opacity-50
+					{liked
+						? 'border-red-400/50 text-red-400'
+						: 'border-gold/25 text-parchment/60 hover:text-red-400/80 hover:border-red-400/30'}"
+			>
+				<svg class="w-4 h-4" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"/></svg>
+				<span class="font-cinzel text-sm">{liked ? 'Liked' : 'Like'}</span>
+				<span class="text-sm">{likeCount}</span>
+			</button>
+			<button class="btn-gold" onclick={handleModify} disabled={working}>
+				{working ? '...' : 'Modify'}
 			</button>
 		</div>
 
