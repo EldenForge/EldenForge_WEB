@@ -6,6 +6,9 @@
 	import { authStore } from '$lib/stores/auth';
 	import { openLoginModal } from '$lib/stores/ui';
 	import { ApiError } from '$lib/api/auth';
+	import { loadAllItems } from '$lib/api/items';
+	import GuideView from '$lib/components/GuideView.svelte';
+	import type { AnyItem } from '$lib/stores/tooltip';
 
 	let build = $state<PublicBuildOut | null>(null);
 	let loading = $state(true);
@@ -14,8 +17,15 @@
 	let liked = $state(false);
 	let likeCount = $state(0);
 	let likePending = $state(false);
+	let guideItems = $state<(AnyItem & { id: string })[]>([]);
 
 	const id = $derived($page.params.id as string);
+
+	// Pseudos are unique, so this reliably identifies ownership without depending
+	// on the (possibly expired) access-token cookie used by optional auth.
+	const isMine = $derived(
+		build != null && $authStore.user != null && build.author_pseudo === $authStore.user.pseudo
+	);
 
 	async function load() {
 		loading = true;
@@ -61,7 +71,7 @@
 			openLoginModal();
 			return;
 		}
-		if (build.is_mine) {
+		if (isMine) {
 			goto(`/build?build=${build.id}`);
 			return;
 		}
@@ -79,7 +89,18 @@
 	const stats = $derived(build?.data?.stats as Record<string, number> | undefined);
 	const guide = $derived(build?.data?.guide as string | undefined);
 
-	onMount(load);
+	onMount(() => {
+		load();
+		// Load item data so [Item] references in the guide render as chips.
+		loadAllItems()
+			.then((d) => {
+				guideItems = [
+					...d.weapons, ...d.shields, ...d.armors, ...d.talismans,
+					...d.sorceries, ...d.incantations, ...d.spirits
+				];
+			})
+			.catch(() => {});
+	});
 </script>
 
 <svelte:head><title>{build ? `${build.name} — Elden Forge` : 'Build — Elden Forge'}</title></svelte:head>
@@ -158,7 +179,7 @@
 		{#if guide}
 			<section class="card">
 				<h2 class="section-title">Guide</h2>
-				<p class="text-parchment/80 text-sm whitespace-pre-wrap">{guide}</p>
+				<GuideView {guide} allItems={guideItems} />
 			</section>
 		{/if}
 	{/if}
