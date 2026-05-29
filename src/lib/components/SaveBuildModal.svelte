@@ -2,6 +2,7 @@
 	import { ApiError } from '$lib/api/auth';
 	import { createBuild, updateBuild } from '$lib/api/builds';
 	import type { BuildPayload } from '$lib/builds/serialize';
+	import { ALLOWED_TAGS } from '$lib/builds/tags';
 
 	interface Props {
 		open: boolean;
@@ -10,6 +11,7 @@
 		existingName?: string;
 		existingDescription?: string | null;
 		existingIsPublic?: boolean;
+		existingTags?: string[];
 		onclose: () => void;
 		onsaved?: (buildId: string) => void;
 	}
@@ -21,6 +23,7 @@
 		existingName = '',
 		existingDescription = '',
 		existingIsPublic = false,
+		existingTags = [],
 		onclose,
 		onsaved
 	}: Props = $props();
@@ -28,6 +31,7 @@
 	let name = $state('');
 	let description = $state('');
 	let isPublic = $state(false);
+	let tags = $state<string[]>([]);
 	let submitting = $state(false);
 	let error = $state<string | null>(null);
 
@@ -36,10 +40,15 @@
 			name = existingName;
 			description = existingDescription ?? '';
 			isPublic = existingIsPublic;
+			tags = existingTags ?? [];
 			submitting = false;
 			error = null;
 		}
 	});
+
+	function toggleTag(t: string) {
+		tags = tags.includes(t) ? tags.filter((x) => x !== t) : [...tags, t];
+	}
 
 	async function handleSubmit(e: SubmitEvent) {
 		e.preventDefault();
@@ -57,14 +66,16 @@
 					name,
 					description: description || null,
 					data: payload as unknown as Record<string, unknown>,
-					is_public: isPublic
+					is_public: isPublic,
+					tags
 				});
 			} else {
 				saved = await createBuild({
 					name,
 					description: description || undefined,
 					data: payload as unknown as Record<string, unknown>,
-					is_public: isPublic
+					is_public: isPublic,
+					tags
 				});
 			}
 			onsaved?.(saved.id);
@@ -138,6 +149,24 @@
 					<input type="checkbox" bind:checked={isPublic} class="accent-gold" />
 					Make this build public
 				</label>
+
+				<div>
+					<label class="block text-xs text-gold/60 font-cinzel mb-1 tracking-wider">Tags</label>
+					<div class="flex flex-wrap gap-1.5">
+						{#each ALLOWED_TAGS as t}
+							<button
+								type="button"
+								onclick={() => toggleTag(t)}
+								class="text-[11px] font-cinzel rounded px-2 py-0.5 border transition-colors cursor-pointer
+									{tags.includes(t)
+									? 'text-gold bg-gold/15 border-gold/50'
+									: 'text-parchment/50 border-dark-400 hover:border-gold/30'}"
+							>
+								{t}
+							</button>
+						{/each}
+					</div>
+				</div>
 
 				{#if error}
 					<p class="text-red-400 text-xs">{error}</p>

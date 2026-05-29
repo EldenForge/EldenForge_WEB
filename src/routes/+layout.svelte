@@ -34,6 +34,15 @@
 				? 'text-gold bg-gold/10 border border-gold/30'
 				: 'text-parchment/50 hover:text-parchment/80'}"
 		>
+			Explore
+		</a>
+		<a
+			href="/build"
+			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
+				{$page.url.pathname === '/build'
+				? 'text-gold bg-gold/10 border border-gold/30'
+				: 'text-parchment/50 hover:text-parchment/80'}"
+		>
 			Build
 		</a>
 		<a

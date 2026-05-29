@@ -12,6 +12,8 @@ export interface BuildListItem {
 export interface BuildOut extends BuildListItem {
 	user_id: string;
 	data: Record<string, unknown>;
+	tags: string[];
+	forked_from_id: string | null;
 }
 
 export interface BuildCreateInput {
@@ -19,6 +21,7 @@ export interface BuildCreateInput {
 	description?: string;
 	data: Record<string, unknown>;
 	is_public?: boolean;
+	tags?: string[];
 }
 
 export interface BuildUpdateInput {
@@ -26,6 +29,7 @@ export interface BuildUpdateInput {
 	description?: string | null;
 	data?: Record<string, unknown>;
 	is_public?: boolean;
+	tags?: string[];
 }
 
 export async function createBuild(input: BuildCreateInput): Promise<BuildOut> {
@@ -46,4 +50,61 @@ export async function updateBuild(id: string, input: BuildUpdateInput): Promise<
 
 export async function deleteBuild(id: string): Promise<void> {
 	await del<void>(`/builds/${id}`);
+}
+
+export interface PublicBuildListItem {
+	id: string;
+	name: string;
+	description: string | null;
+	tags: string[];
+	like_count: number;
+	created_at: string;
+	author_pseudo: string;
+	liked_by_me: boolean;
+}
+
+export interface ForkedFromInfo {
+	id: string;
+	name: string;
+	author_pseudo: string;
+}
+
+export interface PublicBuildOut {
+	id: string;
+	name: string;
+	description: string | null;
+	data: Record<string, unknown>;
+	tags: string[];
+	like_count: number;
+	created_at: string;
+	updated_at: string;
+	author_pseudo: string;
+	liked_by_me: boolean;
+	forked_from: ForkedFromInfo | null;
+}
+
+export interface ListPublicParams {
+	search?: string;
+	tags?: string[];
+	sort?: 'recent' | 'popular';
+	limit?: number;
+	offset?: number;
+}
+
+export async function listPublicBuilds(params: ListPublicParams = {}): Promise<PublicBuildListItem[]> {
+	const q = new URLSearchParams();
+	if (params.search) q.set('search', params.search);
+	if (params.tags && params.tags.length) q.set('tags', params.tags.join(','));
+	if (params.sort) q.set('sort', params.sort);
+	q.set('limit', String(params.limit ?? 20));
+	q.set('offset', String(params.offset ?? 0));
+	return get<PublicBuildListItem[]>(`/public/builds?${q.toString()}`);
+}
+
+export async function getPublicBuild(id: string): Promise<PublicBuildOut> {
+	return get<PublicBuildOut>(`/public/builds/${id}`);
+}
+
+export async function forkBuild(id: string): Promise<BuildOut> {
+	return post<BuildOut>(`/builds/${id}/fork`);
 }
