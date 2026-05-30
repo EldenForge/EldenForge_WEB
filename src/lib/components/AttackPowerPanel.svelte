@@ -74,7 +74,8 @@
 			<div class="relative shrink-0">
 				<select
 					bind:value={level}
-					class="appearance-none bg-dark-800 border border-dark-400 rounded text-xs text-parchment/80 pl-2 pr-5 py-0.5 font-cinzel cursor-pointer focus:outline-none focus:border-gold/50"
+					style="appearance: none; -webkit-appearance: none; -moz-appearance: none; background-image: none;"
+					class="bg-dark-800 border border-dark-400 rounded text-xs text-parchment/80 pl-2 pr-5 py-0.5 font-cinzel cursor-pointer focus:outline-none focus:border-gold/50"
 				>
 					{#each Array.from({ length: maxLevel + 1 }, (_, i) => i) as L}
 						<option value={L}>+{L}</option>
