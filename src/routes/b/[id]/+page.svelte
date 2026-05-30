@@ -9,8 +9,11 @@
 	import { loadAllItems } from '$lib/api/items';
 	import GuideView from '$lib/components/GuideView.svelte';
 	import BuildSummary from '$lib/components/BuildSummary.svelte';
+	import RadarChart from '$lib/components/charts/RadarChart.svelte';
+	import BarList from '$lib/components/charts/BarList.svelte';
 	import { deserializeBuild, type BuildPayload } from '$lib/builds/serialize';
 	import type { AnyItem } from '$lib/stores/tooltip';
+	import type { Weapon } from '$lib/types';
 
 	let build = $state<PublicBuildOut | null>(null);
 	let loading = $state(true);
@@ -27,6 +30,90 @@
 	const buildState = $derived(
 		build && lookups ? deserializeBuild(build.data as unknown as BuildPayload, lookups) : null
 	);
+
+	// ── Données pour les graphes ──
+	const statLabels = ['Vig', 'Mnd', 'End', 'Str', 'Dex', 'Int', 'Fai', 'Arc'];
+	const statValues = $derived(
+		buildState
+			? [
+					buildState.stats.vigor,
+					buildState.stats.mind,
+					buildState.stats.endurance,
+					buildState.stats.strength,
+					buildState.stats.dexterity,
+					buildState.stats.intelligence,
+					buildState.stats.faith,
+					buildState.stats.arcane
+				]
+			: []
+	);
+
+	const negCats = ['Phy', 'Strike', 'Slash', 'Pierce', 'Magic', 'Fire', 'Ligt', 'Holy'];
+	const armorNegValues = $derived(
+		buildState
+			? (() => {
+					const sums: Record<string, number> = Object.fromEntries(negCats.map((c) => [c, 0]));
+					for (const piece of [
+						buildState.armor.head,
+						buildState.armor.chest,
+						buildState.armor.hands,
+						buildState.armor.legs
+					]) {
+						if (!piece) continue;
+						const arr = (piece as { dmgNegation?: { name: string; amount: number | string }[] }).dmgNegation;
+						if (!Array.isArray(arr)) continue;
+						for (const e of arr) {
+							if (sums[e.name] !== undefined) sums[e.name] += Number(e.amount) || 0;
+						}
+					}
+					return negCats.map((c) => Math.round(sums[c] * 10) / 10);
+				})()
+			: []
+	);
+
+	const resCats = ['Immunity', 'Robustness', 'Focus', 'Vitality', 'Poise'];
+	const resValues = $derived(
+		buildState
+			? (() => {
+					const sums: Record<string, number> = Object.fromEntries(resCats.map((c) => [c, 0]));
+					for (const piece of [
+						buildState.armor.head,
+						buildState.armor.chest,
+						buildState.armor.hands,
+						buildState.armor.legs
+					]) {
+						if (!piece) continue;
+						const arr = (piece as { resistance?: { name: string; amount: number | string }[] }).resistance;
+						if (!Array.isArray(arr)) continue;
+						for (const e of arr) {
+							if (sums[e.name] !== undefined) sums[e.name] += Number(e.amount) || 0;
+						}
+					}
+					return resCats.map((c) => sums[c]);
+				})()
+			: []
+	);
+
+	const dmgColors: Record<string, string> = {
+		Phy: 'rgb(200 169 81 / 0.85)',
+		Mag: 'rgb(125 168 232 / 0.85)',
+		Fire: 'rgb(239 108 80 / 0.85)',
+		Ligt: 'rgb(253 216 53 / 0.85)',
+		Holy: 'rgb(255 249 196 / 0.85)'
+	};
+
+	function weaponDmgItems(w: Weapon | null) {
+		if (!w || !Array.isArray(w.attack)) return [];
+		return w.attack
+			.filter((a) => a.name !== 'Crit')
+			.map((a) => ({ label: a.name, value: Number(a.amount) || 0, color: dmgColors[a.name] }));
+	}
+
+	const hasArmor = $derived(
+		!!buildState &&
+			(buildState.armor.head || buildState.armor.chest || buildState.armor.hands || buildState.armor.legs)
+	);
+	const hasWeapon = $derived(!!buildState && (buildState.weapons.right || buildState.weapons.left));
 
 	// Pseudos are unique, so this reliably identifies ownership without depending
 	// on the (possibly expired) access-token cookie used by optional auth.
@@ -213,6 +300,54 @@
 			<section class="card mb-4">
 				<h2 class="section-title">Equipment</h2>
 				<BuildSummary build={buildState} />
+			</section>
+		{/if}
+
+		{#if buildState && (hasWeapon || hasArmor || statValues.length > 0)}
+			<section class="card mb-4">
+				<h2 class="section-title">Overview</h2>
+				<div class="grid md:grid-cols-2 gap-x-8 gap-y-6">
+					<div>
+						<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2 text-center">Stats</h3>
+						<RadarChart labels={statLabels} values={statValues} max={99} />
+					</div>
+
+					<div>
+						<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2 text-center">Weapon Damage</h3>
+						{#if buildState.weapons.right}
+							<p class="text-parchment/50 text-[11px] mb-1 truncate">Right · {buildState.weapons.right.name}</p>
+							<BarList items={weaponDmgItems(buildState.weapons.right)} />
+						{/if}
+						{#if buildState.weapons.left}
+							<p class="text-parchment/50 text-[11px] mt-3 mb-1 truncate">Left · {buildState.weapons.left.name}</p>
+							<BarList items={weaponDmgItems(buildState.weapons.left)} />
+						{/if}
+						{#if !hasWeapon}
+							<p class="text-parchment/30 text-xs italic text-center py-6 font-cinzel">No weapon equipped</p>
+						{/if}
+					</div>
+
+					<div>
+						<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2 text-center">Damage Negation</h3>
+						{#if hasArmor}
+							<RadarChart labels={negCats} values={armorNegValues} />
+						{:else}
+							<p class="text-parchment/30 text-xs italic text-center py-6 font-cinzel">No armor equipped</p>
+						{/if}
+					</div>
+
+					<div>
+						<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2 text-center">Resistances</h3>
+						{#if hasArmor}
+							<BarList
+								items={resCats.map((c, i) => ({ label: c, value: resValues[i] }))}
+								format={(n) => String(Math.round(n))}
+							/>
+						{:else}
+							<p class="text-parchment/30 text-xs italic text-center py-6 font-cinzel">No armor equipped</p>
+						{/if}
+					</div>
+				</div>
 			</section>
 		{/if}
 
