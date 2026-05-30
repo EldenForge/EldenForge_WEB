@@ -15,12 +15,12 @@
 	}
 </script>
 
-<div class="flex flex-col gap-2">
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
 	{#each TAG_GROUPS as group}
-		<div class="flex items-center gap-2 flex-wrap">
-			<span class="text-[10px] font-cinzel uppercase tracking-widest text-gold/50 w-24 shrink-0">
+		<div>
+			<p class="text-[10px] font-cinzel uppercase tracking-[0.2em] text-gold/50 mb-1.5 border-b border-gold/15 pb-1">
 				{group.label}
-			</span>
+			</p>
 			<div class="flex flex-wrap gap-1.5">
 				{#each group.tags as tag}
 					<button
