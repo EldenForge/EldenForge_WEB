@@ -71,14 +71,23 @@
 		{/if}
 		<span class="font-cinzel text-parchment/80 truncate flex-1">{weapon.name}</span>
 		{#if !loading && maxLevel > 0}
-			<select
-				bind:value={level}
-				class="bg-dark-800 border border-dark-400 rounded text-xs text-parchment/80 px-1 py-0.5 font-cinzel"
-			>
-				{#each Array.from({ length: maxLevel + 1 }, (_, i) => i) as L}
-					<option value={L}>+{L}</option>
-				{/each}
-			</select>
+			<div class="relative shrink-0">
+				<select
+					bind:value={level}
+					class="appearance-none bg-dark-800 border border-dark-400 rounded text-xs text-parchment/80 pl-2 pr-5 py-0.5 font-cinzel cursor-pointer focus:outline-none focus:border-gold/50"
+				>
+					{#each Array.from({ length: maxLevel + 1 }, (_, i) => i) as L}
+						<option value={L}>+{L}</option>
+					{/each}
+				</select>
+				<svg
+					class="absolute right-1.5 top-1/2 -translate-y-1/2 w-2.5 h-2.5 text-gold/70 pointer-events-none"
+					viewBox="0 0 12 12"
+					fill="currentColor"
+				>
+					<path d="M6 8L1 3h10z" />
+				</svg>
+			</div>
 		{/if}
 	</div>
 
