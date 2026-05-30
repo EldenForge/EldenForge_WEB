@@ -431,9 +431,9 @@
 			</div>
 
 			<!-- Right column: Build Summary -->
-			<aside class="lg:col-span-1">
+			<aside class="lg:col-span-1 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] flex flex-col gap-3">
 				<div
-					class="card lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto border-t-2 border-t-gold/40"
+					class="card flex-1 min-h-0 lg:overflow-y-auto border-t-2 border-t-gold/40"
 				>
 					<h2 class="section-title">Build Summary</h2>
 
@@ -665,25 +665,25 @@
 							<span class="font-cinzel text-gold text-lg">{totalWeight.toFixed(1)}</span>
 						</div>
 					{/if}
+				</div>
 
-					<!-- Action buttons -->
-					<div class="flex gap-3 mt-6">
-						<button class="btn-reset flex-1" onclick={() => buildStore.reset()}>
-							Reset
-						</button>
-						<button class="btn-gold flex-1" onclick={openSave} disabled={!hasBuild}>
-							{#if saved}
-								Saved!
-							{:else if loadedBuildId}
-								Update
-							{:else}
-								Save
-							{/if}
-						</button>
-						<button class="btn-gold flex-1" onclick={copyBuild} disabled={!hasBuild}>
-							{copied ? 'Copied!' : 'Copy JSON'}
-						</button>
-					</div>
+				<!-- Action buttons (toujours visibles, hors du scroll du recap) -->
+				<div class="card shrink-0 !py-3 flex gap-3">
+					<button class="btn-reset flex-1" onclick={() => buildStore.reset()}>
+						Reset
+					</button>
+					<button class="btn-gold flex-1" onclick={openSave} disabled={!hasBuild}>
+						{#if saved}
+							Saved!
+						{:else if loadedBuildId}
+							Update
+						{:else}
+							Save
+						{/if}
+					</button>
+					<button class="btn-gold flex-1" onclick={copyBuild} disabled={!hasBuild}>
+						{copied ? 'Copied!' : 'Copy JSON'}
+					</button>
 				</div>
 			</aside>
 		</div>
