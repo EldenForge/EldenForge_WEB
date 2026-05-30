@@ -10,7 +10,6 @@
 	let error = $state<string | null>(null);
 
 	let search = $state('');
-	let author = $state('');
 	let selectedTags = $state<string[]>([]);
 	let sort = $state<'recent' | 'popular' | 'trending'>('recent');
 	let offset = $state(0);
@@ -25,7 +24,6 @@
 	let showItemDropdown = $state(false);
 
 	let searchTimer: ReturnType<typeof setTimeout>;
-	let authorTimer: ReturnType<typeof setTimeout>;
 
 	const itemSuggestions = $derived(
 		itemQuery && !itemSelected
@@ -44,7 +42,6 @@
 				tags: selectedTags,
 				sort,
 				item: itemSelected?.id,
-				author: author || undefined,
 				limit: LIMIT,
 				offset: reset ? 0 : offset
 			});
@@ -66,10 +63,6 @@
 	function onSearchInput() {
 		clearTimeout(searchTimer);
 		searchTimer = setTimeout(() => load(true), 300);
-	}
-	function onAuthorInput() {
-		clearTimeout(authorTimer);
-		authorTimer = setTimeout(() => load(true), 300);
 	}
 	function onTagsChange(tags: string[]) {
 		selectedTags = tags;
@@ -101,7 +94,6 @@
 	}
 	function resetFilters() {
 		search = '';
-		author = '';
 		selectedTags = [];
 		sort = 'recent';
 		clearItem();
@@ -141,8 +133,8 @@
 		</p>
 	</header>
 
-	<div class="space-y-3 mb-8">
-		<!-- Ligne 1: recherche + auteur -->
+	<div class="space-y-4 mb-8">
+		<!-- Ligne 1: recherche + item autocomplete -->
 		<div class="grid grid-cols-1 md:grid-cols-2 gap-3">
 			<input
 				type="text"
@@ -152,92 +144,82 @@
 				class="bg-dark-800 border border-dark-400 text-parchment rounded-lg px-4 py-2.5
 					text-sm placeholder:text-parchment/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50"
 			/>
-			<input
-				type="text"
-				bind:value={author}
-				oninput={onAuthorInput}
-				placeholder="Filter by author pseudo..."
-				class="bg-dark-800 border border-dark-400 text-parchment rounded-lg px-4 py-2.5
-					text-sm placeholder:text-parchment/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50"
-			/>
-		</div>
-
-		<!-- Ligne 2: recherche item (autocomplete) -->
-		<div class="relative">
-			<div class="flex items-center gap-2">
-				<input
-					type="text"
-					bind:value={itemQuery}
-					oninput={onItemInput}
-					onfocus={() => (showItemDropdown = true)}
-					onblur={() => setTimeout(() => (showItemDropdown = false), 150)}
-					placeholder={allItems.length ? 'Filter by equipped item (start typing…)' : 'Loading items for search…'}
-					disabled={!allItems.length}
-					class="flex-1 bg-dark-800 border border-dark-400 text-parchment rounded-lg px-4 py-2.5
-						text-sm placeholder:text-parchment/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 disabled:opacity-50"
-				/>
-				{#if itemSelected}
-					<button
-						type="button"
-						onclick={clearItem}
-						class="text-xs font-cinzel px-3 py-2 rounded border border-rose-400/40 text-rose-300/80 hover:border-rose-400/70"
+			<div class="relative">
+				<div class="flex items-center gap-2">
+					<input
+						type="text"
+						bind:value={itemQuery}
+						oninput={onItemInput}
+						onfocus={() => (showItemDropdown = true)}
+						onblur={() => setTimeout(() => (showItemDropdown = false), 150)}
+						placeholder={allItems.length ? 'Filter by equipped item (start typing…)' : 'Loading items for search…'}
+						disabled={!allItems.length}
+						class="flex-1 bg-dark-800 border border-dark-400 text-parchment rounded-lg px-4 py-2.5
+							text-sm placeholder:text-parchment/30 focus:outline-none focus:border-gold focus:ring-1 focus:ring-gold/50 disabled:opacity-50"
+					/>
+					{#if itemSelected}
+						<button
+							type="button"
+							onclick={clearItem}
+							class="text-xs font-cinzel px-3 py-2 rounded border border-rose-400/40 text-rose-300/80 hover:border-rose-400/70"
+						>
+							Clear
+						</button>
+					{/if}
+				</div>
+				{#if showItemDropdown && itemSuggestions.length}
+					<div
+						class="absolute left-0 right-0 top-full mt-1 z-30 bg-dark-800 border border-gold/30 rounded-lg overflow-hidden shadow-xl max-h-72 overflow-y-auto"
 					>
-						Clear
-					</button>
+						{#each itemSuggestions as s (s.id)}
+							<button
+								type="button"
+								class="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gold/10 transition-colors"
+								onmousedown={() => selectItem(s)}
+							>
+								{#if s.image}
+									<img
+										src={s.image}
+										alt={s.name}
+										class="w-7 h-7 object-contain bg-dark-900 rounded shrink-0"
+										onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+									/>
+								{:else}
+									<div class="w-7 h-7 bg-dark-900 rounded shrink-0"></div>
+								{/if}
+								<span class="text-sm text-parchment truncate flex-1">{s.name}</span>
+								<span class="text-[10px] text-gold/50 font-cinzel uppercase tracking-wider shrink-0">{s.category}</span>
+							</button>
+						{/each}
+					</div>
 				{/if}
 			</div>
-			{#if showItemDropdown && itemSuggestions.length}
-				<div
-					class="absolute left-0 right-0 top-full mt-1 z-30 bg-dark-800 border border-gold/30 rounded-lg overflow-hidden shadow-xl max-h-72 overflow-y-auto"
-				>
-					{#each itemSuggestions as s (s.id)}
-						<button
-							type="button"
-							class="w-full flex items-center gap-2 px-3 py-2 text-left hover:bg-gold/10 transition-colors"
-							onmousedown={() => selectItem(s)}
-						>
-							{#if s.image}
-								<img
-									src={s.image}
-									alt={s.name}
-									class="w-7 h-7 object-contain bg-dark-900 rounded shrink-0"
-									onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
-								/>
-							{:else}
-								<div class="w-7 h-7 bg-dark-900 rounded shrink-0"></div>
-							{/if}
-							<span class="text-sm text-parchment truncate flex-1">{s.name}</span>
-							<span class="text-[10px] text-gold/50 font-cinzel uppercase tracking-wider shrink-0">{s.category}</span>
-						</button>
-					{/each}
-				</div>
-			{/if}
 		</div>
 
-		<!-- Ligne 3: tags + sort + reset -->
-		<div class="flex flex-wrap items-center justify-between gap-3">
-			<TagFilter selected={selectedTags} onchange={onTagsChange} />
-			<div class="flex items-center gap-2 shrink-0">
-				<div class="flex gap-1">
-					{#each [{ id: 'recent', label: 'Recent' }, { id: 'trending', label: 'Trending' }, { id: 'popular', label: 'Popular' }] as opt}
-						<button
-							type="button"
-							onclick={() => setSort(opt.id as 'recent' | 'popular' | 'trending')}
-							class="text-xs font-cinzel px-3 py-1.5 rounded border transition-colors cursor-pointer
-								{sort === opt.id ? 'text-gold bg-gold/15 border-gold/50' : 'text-parchment/50 border-dark-400 hover:border-gold/30'}"
-						>
-							{opt.label}
-						</button>
-					{/each}
-				</div>
-				<button
-					type="button"
-					onclick={resetFilters}
-					class="text-xs font-cinzel px-3 py-1.5 rounded border border-dark-400 text-parchment/40 hover:text-parchment/70 hover:border-parchment/30"
-				>
-					Reset
-				</button>
+		<!-- Tags groupés par catégorie -->
+		<TagFilter selected={selectedTags} onchange={onTagsChange} />
+
+		<!-- Sort + Reset -->
+		<div class="flex items-center justify-end gap-2">
+			<div class="flex gap-1">
+				{#each [{ id: 'recent', label: 'Recent' }, { id: 'trending', label: 'Trending' }, { id: 'popular', label: 'Popular' }] as opt}
+					<button
+						type="button"
+						onclick={() => setSort(opt.id as 'recent' | 'popular' | 'trending')}
+						class="text-xs font-cinzel px-3 py-1.5 rounded border transition-colors cursor-pointer
+							{sort === opt.id ? 'text-gold bg-gold/15 border-gold/50' : 'text-parchment/50 border-dark-400 hover:border-gold/30'}"
+					>
+						{opt.label}
+					</button>
+				{/each}
 			</div>
+			<button
+				type="button"
+				onclick={resetFilters}
+				class="text-xs font-cinzel px-3 py-1.5 rounded border border-dark-400 text-parchment/40 hover:text-parchment/70 hover:border-parchment/30"
+			>
+				Reset
+			</button>
 		</div>
 	</div>
 
