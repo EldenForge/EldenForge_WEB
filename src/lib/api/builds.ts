@@ -1,5 +1,7 @@
 import { post, get, put, del } from './client';
 
+export type BuildIntent = 'pve' | 'coop' | 'pvp';
+
 export interface BuildListItem {
 	id: string;
 	name: string;
@@ -7,6 +9,7 @@ export interface BuildListItem {
 	is_public: boolean;
 	created_at: string;
 	updated_at: string;
+	intent: BuildIntent;
 }
 
 export interface BuildOut extends BuildListItem {
@@ -22,6 +25,7 @@ export interface BuildCreateInput {
 	data: Record<string, unknown>;
 	is_public?: boolean;
 	tags?: string[];
+	intent?: BuildIntent;
 }
 
 export interface BuildUpdateInput {
@@ -30,6 +34,7 @@ export interface BuildUpdateInput {
 	data?: Record<string, unknown>;
 	is_public?: boolean;
 	tags?: string[];
+	intent?: BuildIntent;
 }
 
 export async function createBuild(input: BuildCreateInput): Promise<BuildOut> {
@@ -61,6 +66,7 @@ export interface PublicBuildListItem {
 	created_at: string;
 	author_pseudo: string;
 	liked_by_me: boolean;
+	intent: BuildIntent;
 }
 
 export interface ForkedFromInfo {
@@ -81,6 +87,7 @@ export interface PublicBuildOut {
 	author_pseudo: string;
 	liked_by_me: boolean;
 	is_mine: boolean;
+	intent: BuildIntent;
 	forked_from: ForkedFromInfo | null;
 }
 

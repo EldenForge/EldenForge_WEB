@@ -3,6 +3,7 @@
 	import { likeBuild, unlikeBuild } from '$lib/api/builds';
 	import { authStore } from '$lib/stores/auth';
 	import { openLoginModal } from '$lib/stores/ui';
+	import IntentBadge from './IntentBadge.svelte';
 
 	interface Props { build: PublicBuildListItem; }
 	let { build }: Props = $props();
@@ -38,7 +39,7 @@
 	}
 </script>
 
-<a href="/b/{build.id}" class="card block hover:border-gold/40 transition-colors">
+<a href="/b/{build.id}" class="card block hover:border-gold/40 transition-colors relative pb-7">
 	<div class="flex items-start justify-between gap-2">
 		<h3 class="font-cinzel text-gold text-base truncate">{build.name}</h3>
 		<button
@@ -58,10 +59,13 @@
 		<p class="text-parchment/60 text-sm mt-2 line-clamp-2">{build.description}</p>
 	{/if}
 	{#if build.tags.length}
-		<div class="flex flex-wrap gap-1 mt-3">
+		<div class="flex flex-wrap gap-1 mt-3 pr-14">
 			{#each build.tags as t}
 				<span class="text-[10px] text-gold/70 border border-gold/25 rounded px-1.5 py-0.5">{t}</span>
 			{/each}
 		</div>
 	{/if}
+	<div class="absolute bottom-2 right-2">
+		<IntentBadge intent={build.intent ?? 'pve'} />
+	</div>
 </a>

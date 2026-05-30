@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { ApiError } from '$lib/api/auth';
-	import { createBuild, updateBuild } from '$lib/api/builds';
+	import { createBuild, updateBuild, type BuildIntent } from '$lib/api/builds';
 	import type { BuildPayload } from '$lib/builds/serialize';
 	import { ALLOWED_TAGS } from '$lib/builds/tags';
 
@@ -12,6 +12,7 @@
 		existingDescription?: string | null;
 		existingIsPublic?: boolean;
 		existingTags?: string[];
+		existingIntent?: BuildIntent;
 		onclose: () => void;
 		onsaved?: (buildId: string) => void;
 	}
@@ -24,6 +25,7 @@
 		existingDescription = '',
 		existingIsPublic = false,
 		existingTags = [],
+		existingIntent = 'pve',
 		onclose,
 		onsaved
 	}: Props = $props();
@@ -32,8 +34,15 @@
 	let description = $state('');
 	let isPublic = $state(false);
 	let tags = $state<string[]>([]);
+	let intent = $state<BuildIntent>('pve');
 	let submitting = $state(false);
 	let error = $state<string | null>(null);
+
+	const intentOptions: { value: BuildIntent; label: string; cls: string }[] = [
+		{ value: 'pve', label: 'PvE', cls: 'text-emerald-300 border-emerald-400/60 bg-emerald-400/15' },
+		{ value: 'coop', label: 'Co-op', cls: 'text-sky-300 border-sky-400/60 bg-sky-400/15' },
+		{ value: 'pvp', label: 'PvP', cls: 'text-rose-300 border-rose-400/60 bg-rose-400/15' }
+	];
 
 	$effect(() => {
 		if (open) {
@@ -41,6 +50,7 @@
 			description = existingDescription ?? '';
 			isPublic = existingIsPublic;
 			tags = existingTags ?? [];
+			intent = existingIntent;
 			submitting = false;
 			error = null;
 		}
@@ -67,7 +77,8 @@
 					description: description || null,
 					data: payload as unknown as Record<string, unknown>,
 					is_public: isPublic,
-					tags
+					tags,
+					intent
 				});
 			} else {
 				saved = await createBuild({
@@ -75,7 +86,8 @@
 					description: description || undefined,
 					data: payload as unknown as Record<string, unknown>,
 					is_public: isPublic,
-					tags
+					tags,
+					intent
 				});
 			}
 			onsaved?.(saved.id);
@@ -163,6 +175,24 @@
 									: 'text-parchment/50 border-dark-400 hover:border-gold/30'}"
 							>
 								{t}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<div>
+					<label class="block text-xs text-gold/60 font-cinzel mb-1 tracking-wider">Mode</label>
+					<div class="flex rounded border border-dark-400 overflow-hidden">
+						{#each intentOptions as opt}
+							<button
+								type="button"
+								onclick={() => (intent = opt.value)}
+								class="flex-1 text-xs font-cinzel py-1.5 transition-colors border-r border-dark-400 last:border-r-0
+									{intent === opt.value
+									? opt.cls
+									: 'text-parchment/50 hover:text-parchment/80 bg-dark-800/40'}"
+							>
+								{opt.label}
 							</button>
 						{/each}
 					</div>

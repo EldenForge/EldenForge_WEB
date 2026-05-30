@@ -22,7 +22,7 @@
 	import AuthModal from '$lib/components/AuthModal.svelte';
 	import SaveBuildModal from '$lib/components/SaveBuildModal.svelte';
 	import { serializeBuild, deserializeBuild, type BuildPayload } from '$lib/builds/serialize';
-	import { getBuild } from '$lib/api/builds';
+	import { getBuild, type BuildIntent } from '$lib/api/builds';
 	import { page } from '$app/stores';
 	import { goto } from '$app/navigation';
 
@@ -49,7 +49,7 @@
 		guide: ''
 	});
 	let loadedBuildId = $state<string | null>(null);
-	let loadedBuildMeta = $state<{ name: string; description: string | null; is_public: boolean; tags: string[] } | null>(null);
+	let loadedBuildMeta = $state<{ name: string; description: string | null; is_public: boolean; tags: string[]; intent: BuildIntent } | null>(null);
 
 	// ── Derived item lists ──
 	let headArmors = $derived(armors.filter((a) => a.category === 'Helm'));
@@ -254,7 +254,7 @@
 				});
 				buildStore.setAll(state);
 				loadedBuildId = b.id;
-				loadedBuildMeta = { name: b.name, description: b.description, is_public: b.is_public, tags: b.tags ?? [] };
+				loadedBuildMeta = { name: b.name, description: b.description, is_public: b.is_public, tags: b.tags ?? [], intent: b.intent ?? 'pve' };
 			} catch (e) {
 				console.error('Failed to load build', e);
 				// Strip the param so we don't keep retrying
@@ -626,6 +626,7 @@
 		existingDescription={loadedBuildMeta?.description ?? ''}
 		existingIsPublic={loadedBuildMeta?.is_public ?? false}
 		existingTags={loadedBuildMeta?.tags ?? []}
+		existingIntent={loadedBuildMeta?.intent ?? 'pve'}
 		onclose={() => (saveModalOpen = false)}
 		onsaved={onBuildSaved}
 	/>

@@ -11,6 +11,7 @@
 	import BuildSummary from '$lib/components/BuildSummary.svelte';
 	import RadarChart from '$lib/components/charts/RadarChart.svelte';
 	import BarList from '$lib/components/charts/BarList.svelte';
+	import IntentBadge from '$lib/components/IntentBadge.svelte';
 	import { deserializeBuild, type BuildPayload } from '$lib/builds/serialize';
 	import type { AnyItem } from '$lib/stores/tooltip';
 	import type { Weapon } from '$lib/types';
@@ -225,7 +226,10 @@
 		</div>
 	{:else if build}
 		<header class="mb-6">
-			<h1 class="font-cinzel text-3xl text-gold tracking-wider">{build.name}</h1>
+			<div class="flex items-center gap-3 flex-wrap">
+				<h1 class="font-cinzel text-3xl text-gold tracking-wider">{build.name}</h1>
+				<IntentBadge intent={build.intent ?? 'pve'} size="md" />
+			</div>
 			<p class="text-parchment/50 text-sm mt-1">by {build.author_pseudo}</p>
 			{#if build.forked_from}
 				<p class="text-parchment/30 text-xs mt-1 italic">
