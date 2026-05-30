@@ -99,7 +99,9 @@ export interface LikeStatus {
 export interface ListPublicParams {
 	search?: string;
 	tags?: string[];
-	sort?: 'recent' | 'popular';
+	sort?: 'recent' | 'popular' | 'trending';
+	item?: string;
+	author?: string;
 	limit?: number;
 	offset?: number;
 }
@@ -109,6 +111,8 @@ export async function listPublicBuilds(params: ListPublicParams = {}): Promise<P
 	if (params.search) q.set('search', params.search);
 	if (params.tags && params.tags.length) q.set('tags', params.tags.join(','));
 	if (params.sort) q.set('sort', params.sort);
+	if (params.item) q.set('item', params.item);
+	if (params.author) q.set('author', params.author);
 	q.set('limit', String(params.limit ?? 20));
 	q.set('offset', String(params.offset ?? 0));
 	return get<PublicBuildListItem[]>(`/public/builds?${q.toString()}`);
