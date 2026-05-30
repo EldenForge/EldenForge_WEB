@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { goto } from '$app/navigation';
 	import type { PublicBuildListItem } from '$lib/api/builds';
 	import { likeBuild, unlikeBuild } from '$lib/api/builds';
 	import { authStore } from '$lib/stores/auth';
@@ -54,7 +55,16 @@
 			{count}
 		</button>
 	</div>
-	<p class="text-parchment/40 text-xs mt-1">by {build.author_pseudo}</p>
+	<p class="text-parchment/40 text-xs mt-1">
+		by
+		<button
+			type="button"
+			onclick={(e) => { e.preventDefault(); e.stopPropagation(); goto(`/u/${encodeURIComponent(build.author_pseudo)}`); }}
+			class="text-gold/60 hover:text-gold hover:underline transition-colors"
+		>
+			{build.author_pseudo}
+		</button>
+	</p>
 	{#if build.description}
 		<p class="text-parchment/60 text-sm mt-2 line-clamp-2">{build.description}</p>
 	{/if}

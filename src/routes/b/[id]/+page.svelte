@@ -231,14 +231,22 @@
 				<h1 class="font-cinzel text-3xl text-gold tracking-wider">{build.name}</h1>
 				<IntentBadge intent={build.intent ?? 'pve'} size="md" />
 			</div>
-			<p class="text-parchment/50 text-sm mt-1">by {build.author_pseudo}</p>
+			<p class="text-parchment/50 text-sm mt-1">
+				by
+				<a href="/u/{encodeURIComponent(build.author_pseudo)}" class="text-gold/70 hover:text-gold hover:underline">
+					{build.author_pseudo}
+				</a>
+			</p>
 			{#if build.forked_from}
 				<p class="text-parchment/30 text-xs mt-1 italic">
 					Forked from
 					<a href="/b/{build.forked_from.id}" class="text-gold/60 hover:text-gold underline">
 						{build.forked_from.name}
 					</a>
-					by {build.forked_from.author_pseudo}
+					by
+					<a href="/u/{encodeURIComponent(build.forked_from.author_pseudo)}" class="text-gold/60 hover:text-gold underline">
+						{build.forked_from.author_pseudo}
+					</a>
 				</p>
 			{/if}
 			{#if build.tags.length}

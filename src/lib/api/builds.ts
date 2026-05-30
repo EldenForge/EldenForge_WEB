@@ -133,3 +133,14 @@ export async function likeBuild(id: string): Promise<LikeStatus> {
 export async function unlikeBuild(id: string): Promise<LikeStatus> {
 	return del<LikeStatus>(`/public/builds/${id}/like`);
 }
+
+export interface PublicUserProfile {
+	pseudo: string;
+	created_at: string;
+	builds_count: number;
+	total_likes_received: number;
+}
+
+export async function fetchPublicUser(pseudo: string): Promise<PublicUserProfile> {
+	return get<PublicUserProfile>(`/public/users/${encodeURIComponent(pseudo)}`);
+}
