@@ -73,6 +73,7 @@
 					subtitle={ash.skill}
 					badges={ash.affinity ? [ash.affinity] : []}
 					description={ash.description}
+					findBuildsHref={`/?item=${encodeURIComponent(ash.id)}`}
 				/>
 			{/each}
 		</div>

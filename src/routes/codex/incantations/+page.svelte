@@ -64,6 +64,7 @@
 					subtitle={s.effects}
 					badges={spellBadges(s)}
 					description={s.description}
+					findBuildsHref={`/?item=${encodeURIComponent(s.id)}`}
 				/>
 			{/each}
 		</div>

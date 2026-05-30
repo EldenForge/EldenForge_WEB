@@ -79,6 +79,7 @@
 					subtitle={w.category}
 					badges={scalingBadges(w)}
 					description={w.description}
+					findBuildsHref={`/?item=${encodeURIComponent(w.id)}`}
 				/>
 			{/each}
 		</div>

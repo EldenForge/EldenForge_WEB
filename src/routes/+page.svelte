@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import { listPublicBuilds, type PublicBuildListItem } from '$lib/api/builds';
 	import BuildCard from '$lib/components/BuildCard.svelte';
 	import TagFilter from '$lib/components/TagFilter.svelte';
@@ -100,7 +101,9 @@
 	}
 
 	onMount(async () => {
-		load(true);
+		// Deep-link via ?item=<id> : on charge d'abord allItems pour resoudre
+		// le nom de l'item avant le 1er fetch (sinon le filtre serait vide).
+		const itemFromUrl = $page.url.searchParams.get('item');
 		try {
 			const data = await loadAllItems();
 			const flat: ItemRef[] = [];
@@ -120,6 +123,14 @@
 		} catch {
 			/* autocomplete optionnel, on ignore */
 		}
+		if (itemFromUrl) {
+			const found = allItems.find((i) => i.id === itemFromUrl);
+			if (found) {
+				itemSelected = found;
+				itemQuery = found.name;
+			}
+		}
+		load(true);
 	});
 </script>
 

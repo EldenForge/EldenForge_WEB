@@ -81,6 +81,7 @@
 					subtitle={s.category}
 					badges={guardBadges(s)}
 					description={s.description}
+					findBuildsHref={`/?item=${encodeURIComponent(s.id)}`}
 				/>
 			{/each}
 		</div>

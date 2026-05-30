@@ -60,6 +60,7 @@
 					name={t.name}
 					subtitle={t.effect}
 					description={t.description}
+					findBuildsHref={`/?item=${encodeURIComponent(t.id)}`}
 				/>
 			{/each}
 		</div>

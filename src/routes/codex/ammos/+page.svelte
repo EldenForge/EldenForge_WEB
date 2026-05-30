@@ -73,6 +73,7 @@
 					subtitle={a.type}
 					badges={a.passive ? [a.passive] : []}
 					description={a.description}
+					findBuildsHref={`/?item=${encodeURIComponent(a.id)}`}
 				/>
 			{/each}
 		</div>

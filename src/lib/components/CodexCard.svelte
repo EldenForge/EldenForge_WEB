@@ -5,11 +5,12 @@
 		subtitle?: string;
 		badges?: string[];
 		description?: string;
+		findBuildsHref?: string;
 	}
-	let { image, name, subtitle, badges = [], description }: Props = $props();
+	let { image, name, subtitle, badges = [], description, findBuildsHref }: Props = $props();
 </script>
 
-<div class="card flex gap-3">
+<div class="card flex gap-3 relative {findBuildsHref ? 'pb-7' : ''}">
 	{#if image}
 		<img
 			src={image}
@@ -37,4 +38,10 @@
 			<p class="text-parchment/50 text-[11px] mt-1 line-clamp-3">{description}</p>
 		{/if}
 	</div>
+	{#if findBuildsHref}
+		<a
+			href={findBuildsHref}
+			class="absolute bottom-1.5 right-2 text-[10px] font-cinzel tracking-wider text-gold/40 hover:text-gold transition-colors"
+		>See builds &rarr;</a>
+	{/if}
 </div>
