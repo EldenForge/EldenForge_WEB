@@ -556,9 +556,19 @@
 										{/if}
 									</div>
 									{#if slot.ash && slot.item}
-										<p class="text-gold/40 text-[11px] ml-[3.25rem] mt-0.5 italic truncate">
-											+ {slot.ash.name}{slot.ash.skill ? ` (${slot.ash.skill})` : ''}
-										</p>
+										<div class="flex items-center gap-1.5 ml-[3.25rem] mt-0.5">
+											{#if slot.ash.image}
+												<img
+													src={slot.ash.image}
+													alt={slot.ash.name}
+													class="w-4 h-4 object-contain bg-dark-900 rounded shrink-0"
+													onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+												/>
+											{/if}
+											<span class="text-gold/60 text-[11px] italic truncate">
+												{slot.ash.name}{slot.ash.skill ? ` · ${slot.ash.skill}` : ''}
+											</span>
+										</div>
 									{/if}
 								</div>
 							{/each}

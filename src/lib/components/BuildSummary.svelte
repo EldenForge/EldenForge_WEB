@@ -76,7 +76,41 @@
 			<div>
 				<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-1">Weapons</h3>
 				{#each weapons as w}
-					{@render itemRow(w.item!, w.ash ? `${w.label} · ${w.ash.name}` : w.label)}
+					<div class="py-1.5 border-b border-dark-400/40 last:border-0">
+						<div
+							class="flex items-center gap-2"
+							role="presentation"
+							onmouseenter={(e) => tooltipStore.show(w.item!, e.clientX, e.clientY)}
+							onmousemove={(e) => tooltipStore.move(e.clientX, e.clientY)}
+							onmouseleave={() => tooltipStore.hide()}
+						>
+							{#if w.item!.image}
+								<img
+									src={w.item!.image}
+									alt={w.item!.name}
+									class="w-8 h-8 object-contain rounded shrink-0 bg-dark-800"
+									onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+								/>
+							{/if}
+							<div class="min-w-0 flex-1">
+								<span class="text-parchment text-sm block truncate">{w.item!.name}</span>
+								<span class="text-gold/40 text-[11px] italic">{w.label}</span>
+							</div>
+						</div>
+						{#if w.ash}
+							<div class="flex items-center gap-1.5 pl-10 mt-1">
+								{#if w.ash.image}
+									<img
+										src={w.ash.image}
+										alt={w.ash.name}
+										class="w-4 h-4 object-contain bg-dark-900 rounded shrink-0"
+										onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+									/>
+								{/if}
+								<span class="text-gold/60 text-[11px] italic truncate">{w.ash.name}</span>
+							</div>
+						{/if}
+					</div>
 				{/each}
 			</div>
 		{/if}
