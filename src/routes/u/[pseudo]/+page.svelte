@@ -9,6 +9,7 @@
 	} from '$lib/api/builds';
 	import BuildCard from '$lib/components/BuildCard.svelte';
 	import { ApiError } from '$lib/api/auth';
+	import { pickBanner } from '$lib/art/banners';
 
 	let profile = $state<PublicUserProfile | null>(null);
 	let builds = $state<PublicBuildListItem[]>([]);
@@ -16,6 +17,7 @@
 	let error = $state<string | null>(null);
 
 	const pseudo = $derived($page.params.pseudo as string);
+	const banner = $derived(pickBanner(pseudo));
 
 	async function load() {
 		loading = true;
@@ -57,16 +59,30 @@
 			<a href="/" class="btn-reset inline-block">Back to explore</a>
 		</div>
 	{:else if profile}
-		<!-- Bannière (placeholder gradient + lettre géante en filigrane) -->
-		<div class="relative h-40 sm:h-48 rounded-xl overflow-hidden border border-gold/25 mb-6
-				bg-gradient-to-br from-dark-700 via-dark-600 to-dark-900">
-			<div class="absolute inset-0" style="background: radial-gradient(circle at 25% 45%, rgb(200 169 81 / 0.25), transparent 65%); mix-blend-mode: screen;"></div>
-			<div class="absolute inset-0" style="background-image: linear-gradient(135deg, transparent 0%, rgb(200 169 81 / 0.07) 50%, transparent 100%);"></div>
+		<!-- Bannière : screenshot officiel ER/SOTE sélectionné par hash du pseudo -->
+		<div class="relative h-40 sm:h-56 rounded-xl overflow-hidden border border-gold/25 mb-6 bg-dark-900">
+			<img
+				src={banner.path}
+				alt=""
+				aria-hidden="true"
+				class="absolute inset-0 w-full h-full object-cover"
+				loading="eager"
+			/>
+			<!-- Voile sombre pour lisibilité de la carte qui chevauche -->
+			<div class="absolute inset-0" style="background: linear-gradient(to bottom, rgb(0 0 0 / 0.15) 0%, rgb(0 0 0 / 0.55) 70%, rgb(20 18 14 / 0.85) 100%);"></div>
 			<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-				<span class="font-cinzel text-gold/15 text-7xl sm:text-8xl tracking-widest select-none">
+				<span class="font-cinzel text-gold/25 text-7xl sm:text-8xl tracking-widest select-none drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
 					{profile.pseudo[0]?.toUpperCase() ?? '?'}
 				</span>
 			</div>
+			<!-- Attribution discrète -->
+			<a
+				href={banner.source}
+				target="_blank"
+				rel="noopener noreferrer"
+				title="{banner.name} — {banner.copyright}"
+				class="absolute bottom-1 right-2 text-[9px] text-parchment/40 hover:text-parchment/70 font-cinzel tracking-wider"
+			>© BANDAI NAMCO / FromSoftware</a>
 		</div>
 
 		<header class="card mb-6 -mt-16 relative">

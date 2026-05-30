@@ -80,6 +80,14 @@
 
 {@render children()}
 
+<footer class="mt-16 border-t border-gold/10 bg-dark-900/40">
+	<div class="max-w-7xl mx-auto px-4 py-4 text-[10px] text-parchment/40 font-cinzel tracking-wider text-center leading-relaxed">
+		ELDEN RING™ &amp; Shadow of the Erdtree™ &copy; BANDAI NAMCO Entertainment Inc. / FromSoftware, Inc.
+		<br />
+		EldenForge is an unofficial fan-made tool. Images used for illustration purposes only.
+	</div>
+</footer>
+
 <ItemTooltip />
 
 <AuthModal open={$authModalOpen} onclose={closeAuthModal} />

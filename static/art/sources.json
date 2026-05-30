@@ -1,0 +1,76 @@
+{
+  "legal": {
+    "notice_base_game": "ELDEN RING™ & ©BANDAI NAMCO Entertainment Inc. / ©2022 FromSoftware, Inc.",
+    "notice_dlc": "ELDEN RING Shadow of the Erdtree™ & ©BANDAI NAMCO Entertainment Inc. / ©2024 FromSoftware, Inc."
+  },
+  "official_pages": [
+    {"name": "Bandai Namco Europe - ELDEN RING Media Gallery", "type": "official_page", "url": "https://en.bandainamcoent.eu/elden-ring/elden-ring/media"},
+    {"name": "Bandai Namco Europe - ELDEN RING Press Assets", "type": "press_assets", "url": "https://en.bandainamcoent.eu/press/5032"},
+    {"name": "Bandai Namco Europe - Shadow of the Erdtree", "type": "official_page", "url": "https://en.bandainamcoent.eu/elden-ring/elden-ring/shadow-of-the-erdtree"},
+    {"name": "Bandai Namco US - Press Center", "type": "press_center", "url": "https://www.bandainamcoent.com/press-center"},
+    {"name": "Steam - ELDEN RING", "type": "store_page", "url": "https://store.steampowered.com/app/1245620/ELDEN_RING/"},
+    {"name": "Steam - Shadow of the Erdtree", "type": "store_page", "url": "https://store.steampowered.com/app/2778580/ELDEN_RING_Shadow_of_the_Erdtree/"},
+    {"name": "SteamDB - ELDEN RING screenshots", "type": "asset_index", "url": "https://steamdb.info/app/1245620/screenshots/"},
+    {"name": "SteamDB - Shadow of the Erdtree screenshots", "type": "asset_index", "url": "https://steamdb.info/app/2778580/screenshots/"}
+  ],
+  "elden_ring": {
+    "steam_screenshots": [
+      {"name": "ELDEN RING Screenshot 01", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_943bf6fe62352757d9070c1d33e50b92fe8539f1.1920x1080.jpg?t=1767883716"},
+      {"name": "ELDEN RING Screenshot 02", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_dcdac9e4b26ac0ee5248bfd2967d764fd00cdb42.1920x1080.jpg?t=1767883716"},
+      {"name": "ELDEN RING Screenshot 03", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_3c41384a24d86dddd58a8f61db77f9dc0bfda8b5.1920x1080.jpg?t=1767883716"},
+      {"name": "ELDEN RING Screenshot 04", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_e0316c76f8197405c1312d072b84331dd735d60b.1920x1080.jpg?t=1767883716"},
+      {"name": "ELDEN RING Screenshot 05", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_ef61b771ee6b269b1f0cb484233e07a0bfb5f81b.1920x1080.jpg?t=1767883716"},
+      {"name": "ELDEN RING Screenshot 06", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_b1b91299d7e4b94201ac840aa64de54d9f5cb7f3.1920x1080.jpg?t=1767883716"},
+      {"name": "ELDEN RING Screenshot 07", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_510a02cf3045e841e180f2b77fb87545e0c8b59d.1920x1080.jpg?t=1767883716"},
+      {"name": "ELDEN RING Screenshot 08", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_c494372930ca791bdc6221eca134f2270fb2cb9f.1920x1080.jpg?t=1767883716"},
+      {"name": "ELDEN RING Screenshot 09", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_fa6b881ef7c30522012ab2b2b83001e79baee093.1920x1080.jpg?t=1767883716"},
+      {"name": "ELDEN RING Screenshot 10", "type": "screenshot", "url": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1245620/ss_c2baf8aada6140beee79d701d14043899e91af47.1920x1080.jpg?t=1767883716"}
+    ],
+    "steam_assets": [
+      {"name": "ELDEN RING Header Steam", "type": "header", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/header.jpg?t=1767883716"},
+      {"name": "ELDEN RING Capsule Large", "type": "capsule", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_616x353.jpg?t=1767883716"},
+      {"name": "ELDEN RING Capsule Small", "type": "capsule", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/capsule_231x87.jpg?t=1767883716"},
+      {"name": "ELDEN RING Library Capsule", "type": "library_capsule", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900.jpg"},
+      {"name": "ELDEN RING Library Capsule 2x", "type": "library_capsule", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_600x900_2x.jpg"},
+      {"name": "ELDEN RING Hero Capsule", "type": "hero", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/hero_capsule.jpg?t=1767883716"},
+      {"name": "ELDEN RING Library Hero", "type": "hero", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_hero.jpg?t=1767883716"},
+      {"name": "ELDEN RING Library Hero 2x", "type": "hero", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/library_hero_2x.jpg?t=1767883716"},
+      {"name": "ELDEN RING Logo PNG", "type": "logo", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/logo.png"},
+      {"name": "ELDEN RING Logo PNG 2x", "type": "logo", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/logo_2x.png"},
+      {"name": "ELDEN RING Background Generated", "type": "background", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/page_bg_generated_v6b.jpg?t=1767883716"},
+      {"name": "ELDEN RING Background Raw", "type": "background", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/page_bg_raw.jpg?t=1767883716"}
+    ]
+  },
+  "shadow_of_the_erdtree": {
+    "bandai_screenshots": [
+      {"name": "Shadow of the Erdtree Screenshot 01", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-1.png"},
+      {"name": "Shadow of the Erdtree Screenshot 02", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-2.png"},
+      {"name": "Shadow of the Erdtree Screenshot 03", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-3.png"},
+      {"name": "Shadow of the Erdtree Screenshot 04", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-4.png"},
+      {"name": "Shadow of the Erdtree Screenshot 05", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-5.png"},
+      {"name": "Shadow of the Erdtree Screenshot 06", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-6.png"},
+      {"name": "Shadow of the Erdtree Screenshot 07", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-7.png"},
+      {"name": "Shadow of the Erdtree Screenshot 08", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-8.png"},
+      {"name": "Shadow of the Erdtree Screenshot 09", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-9.png"},
+      {"name": "Shadow of the Erdtree Screenshot 10", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-10.png"},
+      {"name": "Shadow of the Erdtree Screenshot 11", "type": "screenshot", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-11.png"}
+    ],
+    "bandai_assets": [
+      {"name": "Shadow of the Erdtree Wallpaper PNG", "type": "wallpaper", "url": "https://media-center.bandainamcoent.eu/games/elden-ring/elden-ring-shadow-of-the-erdtree-wallpaper-download.png"},
+      {"name": "Shadow of the Erdtree Logo Black Background", "type": "logo", "url": "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/00-page-setup/elden-ring-sote-logo-black-bg.png"},
+      {"name": "Shadow of the Erdtree Key Art", "type": "key_art", "url": "https://us-east-1-bandai.graphassets.com/AXzioIclSWilEjFtsMJPwz/oBmYzq2Sk6LaaTvDhLAw"},
+      {"name": "Shadow of the Erdtree Key Art Red Variant", "type": "key_art", "url": "https://us-east-1-bandai.graphassets.com/AXzioIclSWilEjFtsMJPwz/rmrBqkkeTHy2Aq6hcwom"},
+      {"name": "Shadow of the Erdtree Collector Edition Messmer Promo", "type": "promo_art", "url": "https://us-east-1-bandai.graphassets.com/AXzioIclSWilEjFtsMJPwz/hlpdWmnJQ9eIJBSTCoCy"},
+      {"name": "ELDEN RING Logo Bandai US", "type": "logo", "url": "https://us-east-1-bandai.graphassets.com/AXzioIclSWilEjFtsMJPwz/5VoaCTuAS7qiNx8KCuPS"}
+    ],
+    "steam_assets": [
+      {"name": "Shadow of the Erdtree Header Steam", "type": "header", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2778580/header.jpg"},
+      {"name": "Shadow of the Erdtree Capsule Large", "type": "capsule", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2778580/capsule_616x353.jpg"},
+      {"name": "Shadow of the Erdtree Capsule Small", "type": "capsule", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2778580/capsule_231x87.jpg"},
+      {"name": "Shadow of the Erdtree Hero Capsule", "type": "hero", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2778580/hero_capsule.jpg"},
+      {"name": "Shadow of the Erdtree Background Generated", "type": "background", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2778580/page_bg_generated_v6b.jpg"},
+      {"name": "Shadow of the Erdtree Background Raw", "type": "background", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2778580/page_bg_raw.jpg"},
+      {"name": "Shadow of the Erdtree Steam Screenshot", "type": "screenshot", "url": "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2778580/ss_c97bcad291f4f45d4be4594f34bd78921d961099.jpg"}
+    ]
+  }
+}
