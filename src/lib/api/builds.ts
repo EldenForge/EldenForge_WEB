@@ -67,6 +67,7 @@ export interface PublicBuildListItem {
 	author_pseudo: string;
 	liked_by_me: boolean;
 	intent: BuildIntent;
+	primary_weapon_image?: string | null;
 }
 
 export interface ForkedFromInfo {

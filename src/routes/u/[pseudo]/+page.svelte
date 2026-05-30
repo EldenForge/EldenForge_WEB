@@ -57,7 +57,19 @@
 			<a href="/" class="btn-reset inline-block">Back to explore</a>
 		</div>
 	{:else if profile}
-		<header class="card mb-6">
+		<!-- Bannière (placeholder gradient + lettre géante en filigrane) -->
+		<div class="relative h-40 sm:h-48 rounded-xl overflow-hidden border border-gold/25 mb-6
+				bg-gradient-to-br from-dark-700 via-dark-600 to-dark-900">
+			<div class="absolute inset-0" style="background: radial-gradient(circle at 25% 45%, rgb(200 169 81 / 0.25), transparent 65%); mix-blend-mode: screen;"></div>
+			<div class="absolute inset-0" style="background-image: linear-gradient(135deg, transparent 0%, rgb(200 169 81 / 0.07) 50%, transparent 100%);"></div>
+			<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+				<span class="font-cinzel text-gold/15 text-7xl sm:text-8xl tracking-widest select-none">
+					{profile.pseudo[0]?.toUpperCase() ?? '?'}
+				</span>
+			</div>
+		</div>
+
+		<header class="card mb-6 -mt-16 relative">
 			<div class="flex items-center justify-between gap-4 flex-wrap">
 				<div>
 					<h1 class="font-cinzel text-3xl text-gold tracking-wider">{profile.pseudo}</h1>

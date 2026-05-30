@@ -40,7 +40,22 @@
 	}
 </script>
 
-<a href="/b/{build.id}" class="card block hover:border-gold/40 transition-colors relative pb-7">
+<a href="/b/{build.id}" class="card block hover:border-gold/40 transition-colors relative pb-7 overflow-hidden">
+	{#if build.primary_weapon_image}
+		<div
+			class="absolute inset-y-0 left-0 w-32 pointer-events-none flex items-center justify-center"
+			style="mask-image: linear-gradient(to right, black 10%, transparent 95%); -webkit-mask-image: linear-gradient(to right, black 10%, transparent 95%);"
+		>
+			<img
+				src={build.primary_weapon_image}
+				alt=""
+				aria-hidden="true"
+				class="w-full h-full object-contain object-center opacity-70"
+				onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+			/>
+		</div>
+	{/if}
+	<div class="relative {build.primary_weapon_image ? 'pl-24' : ''}">
 	<div class="flex items-start justify-between gap-2">
 		<h3 class="font-cinzel text-gold text-base truncate">{build.name}</h3>
 		<button
@@ -75,6 +90,7 @@
 			{/each}
 		</div>
 	{/if}
+	</div>
 	<div class="absolute bottom-2 right-2">
 		<IntentBadge intent={build.intent ?? 'pve'} />
 	</div>
