@@ -485,10 +485,31 @@
 							<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase">Equip Load</h3>
 							<span class="font-cinzel text-sm" style="color:{ROLL_COLOR[equipRoll]}">{equipRoll}</span>
 						</div>
-						<div class="h-2.5 bg-dark-800 rounded overflow-hidden border border-dark-400/40">
-							<div class="h-full transition-all" style="width:{Math.min(100, equipRatio * 100).toFixed(1)}%; background:{ROLL_COLOR[equipRoll]};"></div>
+						<!-- Barre avec zones colorées + séparateurs aux seuils -->
+						<div class="relative h-3 rounded overflow-hidden border border-dark-400/40">
+							<!-- Fonds des zones -->
+							<div class="absolute inset-0 flex">
+								<div class="w-[30%] bg-emerald-400/10"></div>
+								<div class="w-[40%] bg-gold/10"></div>
+								<div class="w-[30%] bg-orange-400/10"></div>
+							</div>
+							<!-- Séparateurs aux seuils -->
+							<div class="absolute inset-y-0 left-[30%] w-px bg-parchment/25"></div>
+							<div class="absolute inset-y-0 left-[70%] w-px bg-parchment/25"></div>
+							<div class="absolute inset-y-0 left-[99.5%] w-px bg-rose-400/60"></div>
+							<!-- Fill courant -->
+							<div
+								class="h-full transition-all relative"
+								style="width:{Math.min(100, equipRatio * 100).toFixed(1)}%; background:{ROLL_COLOR[equipRoll]};"
+							></div>
 						</div>
-						<p class="text-[11px] text-parchment/50 font-cinzel mt-1 flex justify-between">
+						<!-- Labels des zones -->
+						<div class="relative text-[9px] font-cinzel uppercase tracking-wider mt-1 h-3">
+							<span class="absolute left-0 w-[30%] text-center text-emerald-300/60">Light</span>
+							<span class="absolute left-[30%] w-[40%] text-center text-gold/60">Medium</span>
+							<span class="absolute left-[70%] w-[30%] text-center text-orange-300/60">Heavy</span>
+						</div>
+						<p class="text-[11px] text-parchment/50 font-cinzel mt-1.5 flex justify-between">
 							<span>{totalWeight.toFixed(1)} / {equipMax.toFixed(0)}</span>
 							<span class="text-parchment/30">{(equipRatio * 100).toFixed(0)} %</span>
 						</p>
