@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { Armor, Talisman, Weapon, Spell, Spirit, BuildState, CharacterStats } from '$lib/types';
+import type { Armor, Talisman, Weapon, Spell, Spirit, AshOfWar, BuildState, CharacterStats } from '$lib/types';
 
 function getInitialState(): BuildState {
 	return {
@@ -16,6 +16,7 @@ function getInitialState(): BuildState {
 		armor: { head: null, chest: null, hands: null, legs: null },
 		talismans: [null, null, null, null],
 		weapons: { right: null, left: null },
+		ashes: { right: null, left: null },
 		spells: [null, null, null, null, null, null, null, null, null, null],
 		spirit: null,
 		guide: ''
@@ -39,6 +40,8 @@ function createBuildStore() {
 			}),
 		setWeapon: (slot: 'right' | 'left', item: Weapon | null) =>
 			update((s) => ({ ...s, weapons: { ...s.weapons, [slot]: item } })),
+		setAsh: (slot: 'right' | 'left', item: AshOfWar | null) =>
+			update((s) => ({ ...s, ashes: { ...s.ashes, [slot]: item } })),
 		setSpell: (index: number, item: Spell | null) =>
 			update((s) => {
 				const spells = [...s.spells];

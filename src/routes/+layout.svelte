@@ -53,6 +53,15 @@
 		>
 			Map
 		</a>
+		<a
+			href="/codex"
+			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
+				{$page.url.pathname.startsWith('/codex')
+				? 'text-gold bg-gold/10 border border-gold/30'
+				: 'text-parchment/50 hover:text-parchment/80'}"
+		>
+			Codex
+		</a>
 		{#if $authStore.user}
 			<a
 				href="/builds"

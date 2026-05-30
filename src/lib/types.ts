@@ -95,6 +95,17 @@ export interface CharacterStats {
 	arcane: number;
 }
 
+export interface AshOfWar {
+	id: string;
+	name: string;
+	image: string;
+	affinity: string;
+	skill: string;
+	description: string;
+	dlc?: string | number;
+	[key: string]: unknown;
+}
+
 export interface BuildState {
 	stats: CharacterStats;
 	armor: {
@@ -107,6 +118,10 @@ export interface BuildState {
 	weapons: {
 		right: Weapon | null;
 		left: Weapon | null;
+	};
+	ashes: {
+		right: AshOfWar | null;
+		left: AshOfWar | null;
 	};
 	spells: (Spell | null)[];
 	spirit: Spirit | null;

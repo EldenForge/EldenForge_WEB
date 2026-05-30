@@ -10,8 +10,8 @@
 
 	let weapons = $derived(
 		[
-			{ label: 'Right hand', item: build.weapons.right },
-			{ label: 'Left hand', item: build.weapons.left }
+			{ label: 'Right hand', item: build.weapons.right, ash: build.ashes?.right ?? null },
+			{ label: 'Left hand', item: build.weapons.left, ash: build.ashes?.left ?? null }
 		].filter((w) => w.item)
 	);
 	let armorPieces = $derived(
@@ -76,7 +76,7 @@
 			<div>
 				<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-1">Weapons</h3>
 				{#each weapons as w}
-					{@render itemRow(w.item!, w.label)}
+					{@render itemRow(w.item!, w.ash ? `${w.label} · ${w.ash.name}` : w.label)}
 				{/each}
 			</div>
 		{/if}

@@ -10,6 +10,7 @@
 		Incantation,
 		Spell,
 		Spirit,
+		AshOfWar,
 		CharacterStats
 	} from '$lib/types';
 
@@ -35,6 +36,7 @@
 	let sorceries = $state<Sorcery[]>([]);
 	let incantations = $state<Incantation[]>([]);
 	let spirits = $state<Spirit[]>([]);
+	let ashes = $state<AshOfWar[]>([]);
 	let loading = $state(true);
 	let error = $state('');
 	let copied = $state(false);
@@ -152,6 +154,15 @@
 		});
 	}
 
+	function handleAshClick(slot: 'right' | 'left') {
+		const currentId = $buildStore.ashes[slot]?.id ?? null;
+		const weaponName = $buildStore.weapons[slot]?.name ?? '';
+		openPicker(`Ash of War — ${weaponName || slot}`, ashes, currentId, (item) => {
+			buildStore.setAsh(slot, item ? (ashes.find((a) => a.id === item.id) ?? null) : null);
+			closePicker();
+		});
+	}
+
 	function handleStatChange(stat: keyof CharacterStats, value: number) {
 		buildStore.setStat(stat, value);
 	}
@@ -204,6 +215,7 @@
 			sorceries = data.sorceries;
 			incantations = data.incantations;
 			spirits = data.spirits;
+			ashes = data.ashes_of_war ?? [];
 		} catch (e) {
 			error = 'Failed to load data. Make sure the API is running (uvicorn main:app on port 8000).';
 			console.error(e);
@@ -251,7 +263,8 @@
 					shields,
 					sorceries,
 					incantations,
-					spirits
+					spirits,
+					ashes_of_war: ashes
 				});
 				buildStore.setAll(state);
 				loadedBuildId = b.id;
@@ -350,6 +363,48 @@
 						onslotclick={handleEquipmentSlotClick}
 					/>
 				</section>
+
+				<!-- Ashes of War -->
+				{#if $buildStore.weapons.right || $buildStore.weapons.left}
+					<section class="card">
+						<h2 class="section-title">Ashes of War</h2>
+						<div class="space-y-2">
+							{#each ['right', 'left'] as const as slot}
+								{@const weapon = $buildStore.weapons[slot]}
+								{@const ash = $buildStore.ashes[slot]}
+								{#if weapon}
+									<div class="flex items-center gap-3 py-1.5 border-b border-dark-400/40 last:border-0">
+										<span class="text-parchment/50 text-xs font-cinzel w-12 shrink-0 capitalize">{slot}</span>
+										<span class="text-parchment/80 text-sm flex-1 truncate">{weapon.name}</span>
+										<button
+											type="button"
+											onclick={() => handleAshClick(slot)}
+											class="flex items-center gap-2 text-xs bg-dark-800 border border-gold/25 hover:border-gold/60 rounded px-2 py-1 transition-colors min-w-[10rem]"
+										>
+											{#if ash}
+												{#if ash.image}
+													<img src={ash.image} alt={ash.name} class="w-6 h-6 object-contain bg-dark-900 rounded shrink-0"
+														onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} />
+												{/if}
+												<span class="text-gold/90 font-cinzel truncate flex-1 text-left">{ash.name}</span>
+											{:else}
+												<span class="text-parchment/50 italic flex-1 text-left">Assign Ash</span>
+											{/if}
+										</button>
+										{#if ash}
+											<button
+												type="button"
+												onclick={() => buildStore.setAsh(slot, null)}
+												aria-label="Remove Ash"
+												class="text-parchment/40 hover:text-red-400/80 text-xs px-1"
+											>&times;</button>
+										{/if}
+									</div>
+								{/if}
+							{/each}
+						</div>
+					</section>
+				{/if}
 
 				<!-- Spells & Spirit -->
 				<section class="card">
@@ -477,26 +532,33 @@
 							<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2">
 								Weapons
 							</h3>
-							{#each [{ label: 'Right', item: $buildStore.weapons.right }, { label: 'Left', item: $buildStore.weapons.left }] as slot}
-								<div class="flex items-center gap-2 py-1.5 border-b border-dark-400/50">
-									<span class="text-parchment/50 text-xs w-12 shrink-0">{slot.label}</span>
-									{#if slot.item}
-										{#if slot.item.image}
-											<img
-												src={slot.item.image}
-												alt={slot.item.name}
-												class="w-8 h-8 object-contain rounded shrink-0 bg-dark-800"
-												onerror={(e) => {
-													(e.currentTarget as HTMLImageElement).style.display = 'none';
-												}}
-											/>
+							{#each [{ label: 'Right', item: $buildStore.weapons.right, ash: $buildStore.ashes.right }, { label: 'Left', item: $buildStore.weapons.left, ash: $buildStore.ashes.left }] as slot}
+								<div class="py-1.5 border-b border-dark-400/50">
+									<div class="flex items-center gap-2">
+										<span class="text-parchment/50 text-xs w-12 shrink-0">{slot.label}</span>
+										{#if slot.item}
+											{#if slot.item.image}
+												<img
+													src={slot.item.image}
+													alt={slot.item.name}
+													class="w-8 h-8 object-contain rounded shrink-0 bg-dark-800"
+													onerror={(e) => {
+														(e.currentTarget as HTMLImageElement).style.display = 'none';
+													}}
+												/>
+											{/if}
+											<span class="text-parchment text-sm flex-1 truncate">{slot.item.name}</span
+											>
+											<span class="text-gold/60 text-xs shrink-0">{slot.item.weight}</span>
+										{:else}
+											<span class="text-parchment/20 text-sm flex-1 italic">Empty</span>
+											<span class="text-parchment/10 text-xs shrink-0">&mdash;</span>
 										{/if}
-										<span class="text-parchment text-sm flex-1 truncate">{slot.item.name}</span
-										>
-										<span class="text-gold/60 text-xs shrink-0">{slot.item.weight}</span>
-									{:else}
-										<span class="text-parchment/20 text-sm flex-1 italic">Empty</span>
-										<span class="text-parchment/10 text-xs shrink-0">&mdash;</span>
+									</div>
+									{#if slot.ash && slot.item}
+										<p class="text-gold/40 text-[11px] ml-[3.25rem] mt-0.5 italic truncate">
+											+ {slot.ash.name}{slot.ash.skill ? ` (${slot.ash.skill})` : ''}
+										</p>
 									{/if}
 								</div>
 							{/each}
