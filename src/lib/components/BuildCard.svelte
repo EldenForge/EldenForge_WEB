@@ -91,7 +91,13 @@
 		</div>
 	{/if}
 	</div>
-	<div class="absolute bottom-2 right-2">
+	<div class="absolute bottom-2 right-2 flex items-center gap-1.5">
+		{#if build.has_dlc}
+			<span
+				title="Uses Shadow of the Erdtree content"
+				class="text-[9px] font-cinzel tracking-widest uppercase px-1.5 py-0.5 rounded border border-purple-400/40 bg-purple-500/15 text-purple-200/90"
+			>SOTE</span>
+		{/if}
 		<IntentBadge intent={build.intent ?? 'pve'} />
 	</div>
 </a>

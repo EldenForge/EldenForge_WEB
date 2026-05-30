@@ -68,6 +68,7 @@ export interface PublicBuildListItem {
 	liked_by_me: boolean;
 	intent: BuildIntent;
 	primary_weapon_image?: string | null;
+	has_dlc: boolean;
 }
 
 export interface ForkedFromInfo {
@@ -90,6 +91,7 @@ export interface PublicBuildOut {
 	is_mine: boolean;
 	intent: BuildIntent;
 	forked_from: ForkedFromInfo | null;
+	has_dlc: boolean;
 }
 
 export interface LikeStatus {

@@ -230,6 +230,12 @@
 			<div class="flex items-center gap-3 flex-wrap">
 				<h1 class="font-cinzel text-3xl text-gold tracking-wider">{build.name}</h1>
 				<IntentBadge intent={build.intent ?? 'pve'} size="md" />
+				{#if build.has_dlc}
+					<span
+						title="Uses Shadow of the Erdtree content"
+						class="text-[10px] font-cinzel tracking-widest uppercase px-2 py-1 rounded border border-purple-400/40 bg-purple-500/15 text-purple-200/90"
+					>SOTE</span>
+				{/if}
 			</div>
 			<p class="text-parchment/50 text-sm mt-1">
 				by
