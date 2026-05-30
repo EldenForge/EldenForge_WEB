@@ -11,6 +11,7 @@
 		Spell,
 		Spirit,
 		AshOfWar,
+		Ammo,
 		CharacterStats
 	} from '$lib/types';
 
@@ -48,6 +49,7 @@
 	let incantations = $state<Incantation[]>([]);
 	let spirits = $state<Spirit[]>([]);
 	let ashes = $state<AshOfWar[]>([]);
+	let ammos = $state<Ammo[]>([]);
 	let loading = $state(true);
 	let error = $state('');
 	let copied = $state(false);
@@ -174,6 +176,41 @@
 		});
 	}
 
+	function handleSecondaryWeapon(side: 'right' | 'left', idx: 0 | 1) {
+		const list = side === 'left' ? leftHandOptions : weapons;
+		const key = side === 'right' ? 'rightSecondary' : 'leftSecondary';
+		const currentId = $buildStore.weapons[key][idx]?.id ?? null;
+		const label = `${side === 'right' ? 'Right' : 'Left'} secondary ${idx + 1}`;
+		openPicker(label, list, currentId, (item) => {
+			buildStore.setSecondaryWeapon(side, idx, item ? (list.find((w) => w.id === item.id) ?? null) : null);
+			closePicker();
+		});
+	}
+
+	function handleSecondaryAsh(side: 'right' | 'left', idx: 0 | 1) {
+		const key = side === 'right' ? 'rightSecondary' : 'leftSecondary';
+		const currentId = $buildStore.ashes[key][idx]?.id ?? null;
+		const wname = $buildStore.weapons[key][idx]?.name ?? `${side} secondary ${idx + 1}`;
+		openPicker(`Ash of War — ${wname}`, ashes, currentId, (item) => {
+			buildStore.setSecondaryAsh(side, idx, item ? (ashes.find((a) => a.id === item.id) ?? null) : null);
+			closePicker();
+		});
+	}
+
+	// Filtre les munitions par mot-clef dans le nom (Arrow vs Bolt)
+	let arrowOptions = $derived(ammos.filter((a) => /arrow/i.test(a.name)));
+	let boltOptions = $derived(ammos.filter((a) => /bolt/i.test(a.name)));
+
+	function handleAmmo(kind: 'arrows' | 'bolts', idx: 0 | 1) {
+		const list = kind === 'arrows' ? arrowOptions : boltOptions;
+		const currentId = $buildStore.ammos[kind][idx]?.id ?? null;
+		const label = `${kind === 'arrows' ? 'Arrows' : 'Bolts'} ${idx + 1}`;
+		openPicker(label, list, currentId, (item) => {
+			buildStore.setAmmo(kind, idx, item ? (list.find((a) => a.id === item.id) ?? null) : null);
+			closePicker();
+		});
+	}
+
 	function handleStatChange(stat: keyof CharacterStats, value: number) {
 		buildStore.setStat(stat, value);
 	}
@@ -273,10 +310,18 @@
 			})
 			.filter((x): x is NonNullable<typeof x> => x !== null);
 	}
+	// Toutes les armes équipées (primaires + secondaires) pour AR & requirements
+	const allEquippedWeapons = $derived.by(() => {
+		const list: { weapon: NonNullable<typeof $buildStore.weapons.right>; label: string }[] = [];
+		if ($buildStore.weapons.right) list.push({ weapon: $buildStore.weapons.right, label: 'Right primary' });
+		$buildStore.weapons.rightSecondary.forEach((w, i) => { if (w) list.push({ weapon: w, label: `Right secondary ${i + 1}` }); });
+		if ($buildStore.weapons.left) list.push({ weapon: $buildStore.weapons.left, label: 'Left primary' });
+		$buildStore.weapons.leftSecondary.forEach((w, i) => { if (w) list.push({ weapon: w, label: `Left secondary ${i + 1}` }); });
+		return list;
+	});
+
 	const weaponReqs = $derived(
-		['right', 'left'].flatMap((slot) => {
-			const w = $buildStore.weapons[slot as 'right' | 'left'];
-			if (!w) return [];
+		allEquippedWeapons.flatMap(({ weapon: w }) => {
 			const reqs = reqsFor((w as { requiredAttributes?: { name: string; amount: number }[] }).requiredAttributes);
 			return reqs.length ? [{ label: w.name, image: w.image, reqs }] : [];
 		})
@@ -313,6 +358,7 @@
 			incantations = data.incantations;
 			spirits = data.spirits;
 			ashes = data.ashes_of_war ?? [];
+			ammos = data.ammos ?? [];
 		} catch (e) {
 			error = 'Failed to load data. Make sure the API is running (uvicorn main:app on port 8000).';
 			console.error(e);
@@ -361,7 +407,8 @@
 					sorceries,
 					incantations,
 					spirits,
-					ashes_of_war: ashes
+					ashes_of_war: ashes,
+					ammos
 				});
 				buildStore.setAll(state);
 				loadedBuildId = b.id;
@@ -479,6 +526,139 @@
 						onslotclick={handleEquipmentSlotClick}
 					/>
 
+					{#snippet weaponMini(label: string, item: Weapon | null, ash: AshOfWar | null, onPick: () => void, onClear: () => void, onAsh: () => void, onAshClear: () => void)}
+						<div class="card !p-2 flex flex-col gap-1">
+							<button
+								type="button"
+								onclick={onPick}
+								class="flex items-center gap-2 text-left hover:bg-dark-700/40 rounded p-1 -m-1 transition-colors"
+							>
+								<div class="w-10 h-10 bg-dark-800 rounded shrink-0 flex items-center justify-center overflow-hidden">
+									{#if item?.image}
+										<img
+											src={item.image}
+											alt={item.name}
+											class="w-full h-full object-contain"
+											onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+										/>
+									{/if}
+								</div>
+								<div class="min-w-0 flex-1">
+									<p class="text-[10px] text-gold/50 font-cinzel uppercase tracking-wider truncate">{label}</p>
+									{#if item}
+										<p class="text-xs text-parchment truncate">{item.name}</p>
+									{:else}
+										<p class="text-xs text-parchment/30 italic">Empty</p>
+									{/if}
+								</div>
+								{#if item}
+									<button
+										type="button"
+										onclick={(e) => { e.stopPropagation(); onClear(); }}
+										aria-label="Remove"
+										class="text-parchment/40 hover:text-red-400/80 text-sm px-1 shrink-0"
+									>&times;</button>
+								{/if}
+							</button>
+							{#if item}
+								<div class="flex items-center gap-1 pl-12">
+									<button
+										type="button"
+										onclick={onAsh}
+										class="flex items-center gap-1 text-[10px] bg-dark-800 border border-gold/20 hover:border-gold/50 rounded px-1.5 py-0.5 flex-1 min-w-0 transition-colors"
+									>
+										{#if ash?.image}
+											<img src={ash.image} alt={ash.name} class="w-3 h-3 object-contain shrink-0" onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} />
+										{/if}
+										<span class="truncate {ash ? 'text-gold/80' : 'text-parchment/50 italic'}">{ash?.name ?? 'Assign Ash'}</span>
+									</button>
+									{#if ash}
+										<button type="button" onclick={onAshClear} aria-label="Remove ash" class="text-parchment/40 hover:text-red-400/80 text-[10px] px-1">&times;</button>
+									{/if}
+								</div>
+							{/if}
+						</div>
+					{/snippet}
+
+					{#snippet ammoMini(label: string, item: Ammo | null, onPick: () => void, onClear: () => void)}
+						<button
+							type="button"
+							onclick={onPick}
+							class="card !p-2 flex items-center gap-2 text-left hover:border-gold/40 transition-colors"
+						>
+							<div class="w-9 h-9 bg-dark-800 rounded shrink-0 flex items-center justify-center overflow-hidden">
+								{#if item?.image}
+									<img src={item.image} alt={item.name} class="w-full h-full object-contain" onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} />
+								{/if}
+							</div>
+							<div class="min-w-0 flex-1">
+								<p class="text-[10px] text-gold/50 font-cinzel uppercase tracking-wider truncate">{label}</p>
+								{#if item}
+									<p class="text-xs text-parchment truncate">{item.name}</p>
+								{:else}
+									<p class="text-xs text-parchment/30 italic">Empty</p>
+								{/if}
+							</div>
+							{#if item}
+								<button type="button" onclick={(e) => { e.stopPropagation(); onClear(); }} aria-label="Remove" class="text-parchment/40 hover:text-red-400/80 text-sm px-1 shrink-0">&times;</button>
+							{/if}
+						</button>
+					{/snippet}
+
+					<!-- Secondary weapons -->
+					<div class="mt-5 pt-4 border-t border-gold/15">
+						<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2">Secondary Weapons</h3>
+						<div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+							{@render weaponMini(
+								'Right 2',
+								$buildStore.weapons.rightSecondary[0],
+								$buildStore.ashes.rightSecondary[0],
+								() => handleSecondaryWeapon('right', 0),
+								() => buildStore.setSecondaryWeapon('right', 0, null),
+								() => handleSecondaryAsh('right', 0),
+								() => buildStore.setSecondaryAsh('right', 0, null)
+							)}
+							{@render weaponMini(
+								'Right 3',
+								$buildStore.weapons.rightSecondary[1],
+								$buildStore.ashes.rightSecondary[1],
+								() => handleSecondaryWeapon('right', 1),
+								() => buildStore.setSecondaryWeapon('right', 1, null),
+								() => handleSecondaryAsh('right', 1),
+								() => buildStore.setSecondaryAsh('right', 1, null)
+							)}
+							{@render weaponMini(
+								'Left 2',
+								$buildStore.weapons.leftSecondary[0],
+								$buildStore.ashes.leftSecondary[0],
+								() => handleSecondaryWeapon('left', 0),
+								() => buildStore.setSecondaryWeapon('left', 0, null),
+								() => handleSecondaryAsh('left', 0),
+								() => buildStore.setSecondaryAsh('left', 0, null)
+							)}
+							{@render weaponMini(
+								'Left 3',
+								$buildStore.weapons.leftSecondary[1],
+								$buildStore.ashes.leftSecondary[1],
+								() => handleSecondaryWeapon('left', 1),
+								() => buildStore.setSecondaryWeapon('left', 1, null),
+								() => handleSecondaryAsh('left', 1),
+								() => buildStore.setSecondaryAsh('left', 1, null)
+							)}
+						</div>
+					</div>
+
+					<!-- Ammunition -->
+					<div class="mt-4 pt-4 border-t border-gold/15">
+						<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2">Ammunition</h3>
+						<div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+							{@render ammoMini('Arrow 1', $buildStore.ammos.arrows[0], () => handleAmmo('arrows', 0), () => buildStore.setAmmo('arrows', 0, null))}
+							{@render ammoMini('Arrow 2', $buildStore.ammos.arrows[1], () => handleAmmo('arrows', 1), () => buildStore.setAmmo('arrows', 1, null))}
+							{@render ammoMini('Bolt 1', $buildStore.ammos.bolts[0], () => handleAmmo('bolts', 0), () => buildStore.setAmmo('bolts', 0, null))}
+							{@render ammoMini('Bolt 2', $buildStore.ammos.bolts[1], () => handleAmmo('bolts', 1), () => buildStore.setAmmo('bolts', 1, null))}
+						</div>
+					</div>
+
 					<!-- Equip Load -->
 					<div class="mt-5 pt-4 border-t border-gold/15">
 						<div class="flex items-center justify-between mb-1">
@@ -516,16 +696,13 @@
 					</div>
 
 					<!-- Attack Power per weapon -->
-					{#if $buildStore.weapons.right || $buildStore.weapons.left}
+					{#if allEquippedWeapons.length}
 						<div class="mt-5 pt-4 border-t border-gold/15">
 							<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-3">Attack Power</h3>
 							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-								{#if $buildStore.weapons.right}
-									<AttackPowerPanel weapon={$buildStore.weapons.right} stats={$buildStore.stats} />
-								{/if}
-								{#if $buildStore.weapons.left}
-									<AttackPowerPanel weapon={$buildStore.weapons.left} stats={$buildStore.stats} />
-								{/if}
+								{#each allEquippedWeapons as w}
+									<AttackPowerPanel weapon={w.weapon} stats={$buildStore.stats} />
+								{/each}
 							</div>
 						</div>
 					{/if}

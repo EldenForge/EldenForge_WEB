@@ -1,5 +1,5 @@
 import { writable } from 'svelte/store';
-import type { Armor, Talisman, Weapon, Spell, Spirit, AshOfWar, BuildState, CharacterStats } from '$lib/types';
+import type { Armor, Talisman, Weapon, Spell, Spirit, AshOfWar, Ammo, BuildState, CharacterStats } from '$lib/types';
 
 function getInitialState(): BuildState {
 	return {
@@ -15,8 +15,9 @@ function getInitialState(): BuildState {
 		},
 		armor: { head: null, chest: null, hands: null, legs: null },
 		talismans: [null, null, null, null],
-		weapons: { right: null, left: null },
-		ashes: { right: null, left: null },
+		weapons: { right: null, left: null, rightSecondary: [null, null], leftSecondary: [null, null] },
+		ashes: { right: null, left: null, rightSecondary: [null, null], leftSecondary: [null, null] },
+		ammos: { arrows: [null, null], bolts: [null, null] },
 		spells: [null, null, null, null, null, null, null, null, null, null],
 		spirit: null,
 		guide: ''
@@ -40,8 +41,28 @@ function createBuildStore() {
 			}),
 		setWeapon: (slot: 'right' | 'left', item: Weapon | null) =>
 			update((s) => ({ ...s, weapons: { ...s.weapons, [slot]: item } })),
+		setSecondaryWeapon: (side: 'right' | 'left', index: 0 | 1, item: Weapon | null) =>
+			update((s) => {
+				const key = side === 'right' ? 'rightSecondary' : 'leftSecondary';
+				const arr = [...s.weapons[key]];
+				arr[index] = item;
+				return { ...s, weapons: { ...s.weapons, [key]: arr } };
+			}),
 		setAsh: (slot: 'right' | 'left', item: AshOfWar | null) =>
 			update((s) => ({ ...s, ashes: { ...s.ashes, [slot]: item } })),
+		setSecondaryAsh: (side: 'right' | 'left', index: 0 | 1, item: AshOfWar | null) =>
+			update((s) => {
+				const key = side === 'right' ? 'rightSecondary' : 'leftSecondary';
+				const arr = [...s.ashes[key]];
+				arr[index] = item;
+				return { ...s, ashes: { ...s.ashes, [key]: arr } };
+			}),
+		setAmmo: (kind: 'arrows' | 'bolts', index: 0 | 1, item: Ammo | null) =>
+			update((s) => {
+				const arr = [...s.ammos[kind]];
+				arr[index] = item;
+				return { ...s, ammos: { ...s.ammos, [kind]: arr } };
+			}),
 		setSpell: (index: number, item: Spell | null) =>
 			update((s) => {
 				const spells = [...s.spells];

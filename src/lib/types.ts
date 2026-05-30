@@ -106,6 +106,17 @@ export interface AshOfWar {
 	[key: string]: unknown;
 }
 
+export interface Ammo {
+	id: string;
+	name: string;
+	image: string;
+	description: string;
+	type?: string;
+	attackPower?: unknown;
+	passive?: string;
+	[key: string]: unknown;
+}
+
 export interface BuildState {
 	stats: CharacterStats;
 	armor: {
@@ -118,10 +129,18 @@ export interface BuildState {
 	weapons: {
 		right: Weapon | null;
 		left: Weapon | null;
+		rightSecondary: (Weapon | null)[]; // 2 slots
+		leftSecondary: (Weapon | null)[];  // 2 slots
 	};
 	ashes: {
 		right: AshOfWar | null;
 		left: AshOfWar | null;
+		rightSecondary: (AshOfWar | null)[]; // 2 slots
+		leftSecondary: (AshOfWar | null)[];  // 2 slots
+	};
+	ammos: {
+		arrows: (Ammo | null)[]; // 2 slots
+		bolts: (Ammo | null)[];  // 2 slots
 	};
 	spells: (Spell | null)[];
 	spirit: Spirit | null;
