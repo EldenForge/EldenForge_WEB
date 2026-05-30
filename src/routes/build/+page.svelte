@@ -23,7 +23,17 @@
 	import AuthModal from '$lib/components/AuthModal.svelte';
 	import SaveBuildModal from '$lib/components/SaveBuildModal.svelte';
 	import AttackPowerPanel from '$lib/components/AttackPowerPanel.svelte';
-	import BuildSidebar from '$lib/components/BuildSidebar.svelte';
+	import RadarChart from '$lib/components/charts/RadarChart.svelte';
+	import BarList from '$lib/components/charts/BarList.svelte';
+	import {
+		softCapStatus,
+		maxEquipLoad,
+		rollCategory,
+		ROLL_COLOR,
+		memorySlotsFromMind,
+		characterLevel,
+		normalizeStatKey
+	} from '$lib/ar/mechanics';
 	import { serializeBuild, deserializeBuild, type BuildPayload } from '$lib/builds/serialize';
 	import { getBuild, type BuildIntent } from '$lib/api/builds';
 	import { page } from '$app/stores';
@@ -205,6 +215,92 @@
 			$buildStore.spirit !== null
 	);
 
+	// ── Indicateurs d'aide à la décision (calculés en live) ──
+	const STATS_KEYS = ['vigor','mind','endurance','strength','dexterity','intelligence','faith','arcane'] as const;
+	const STAT_SHORT: Record<(typeof STATS_KEYS)[number], string> = {
+		vigor:'Vig',mind:'Mnd',endurance:'End',strength:'Str',dexterity:'Dex',intelligence:'Int',faith:'Fai',arcane:'Arc'
+	};
+
+	const charLevel = $derived(characterLevel($buildStore.stats));
+	const capWarnings = $derived(
+		STATS_KEYS.map((s) => ({ stat: s, value: $buildStore.stats[s], status: softCapStatus(s, $buildStore.stats[s]) }))
+			.filter((x) => x.status.level > 0)
+	);
+
+	const equipMax = $derived(maxEquipLoad($buildStore.stats.endurance));
+	const equipRatio = $derived(totalWeight / equipMax);
+	const equipRoll = $derived(rollCategory(equipRatio));
+
+	const slotsAvail = $derived(memorySlotsFromMind($buildStore.stats.mind));
+	const slotsUsed = $derived($buildStore.spells.reduce((s, sp) => s + (sp ? sp.slots ?? 1 : 0), 0));
+
+	// Defense + Resistances (armure totale)
+	const NEG_CATS = ['Phy','Strike','Slash','Pierce','Magic','Fire','Ligt','Holy'] as const;
+	const RES_CATS = ['Immunity','Robustness','Focus','Vitality','Poise'] as const;
+	const negValues = $derived.by(() => {
+		const sums: Record<string, number> = Object.fromEntries(NEG_CATS.map((c) => [c, 0]));
+		for (const piece of [$buildStore.armor.head, $buildStore.armor.chest, $buildStore.armor.hands, $buildStore.armor.legs]) {
+			if (!piece) continue;
+			const arr = (piece as { dmgNegation?: { name: string; amount: number | string }[] }).dmgNegation;
+			if (!Array.isArray(arr)) continue;
+			for (const e of arr) if (sums[e.name] !== undefined) sums[e.name] += Number(e.amount) || 0;
+		}
+		return NEG_CATS.map((c) => Math.round(sums[c] * 10) / 10);
+	});
+	const resValues = $derived.by(() => {
+		const sums: Record<string, number> = Object.fromEntries(RES_CATS.map((c) => [c, 0]));
+		for (const piece of [$buildStore.armor.head, $buildStore.armor.chest, $buildStore.armor.hands, $buildStore.armor.legs]) {
+			if (!piece) continue;
+			const arr = (piece as { resistance?: { name: string; amount: number | string }[] }).resistance;
+			if (!Array.isArray(arr)) continue;
+			for (const e of arr) if (sums[e.name] !== undefined) sums[e.name] += Number(e.amount) || 0;
+		}
+		return RES_CATS.map((c) => sums[c]);
+	});
+	const hasArmor = $derived(!!($buildStore.armor.head || $buildStore.armor.chest || $buildStore.armor.hands || $buildStore.armor.legs));
+
+	// Requirements check (par item équipé qui a des requis)
+	function reqsFor(raw: { name: string; amount: number | string }[] | undefined) {
+		if (!Array.isArray(raw)) return [];
+		return raw
+			.map((r) => {
+				const k = normalizeStatKey(r.name);
+				if (!k) return null;
+				const need = Number(r.amount) || 0;
+				if (need <= 0) return null;
+				const have = $buildStore.stats[k];
+				return { stat: k, need, have, ok: have >= need, label: STAT_SHORT[k as (typeof STATS_KEYS)[number]] ?? k };
+			})
+			.filter((x): x is NonNullable<typeof x> => x !== null);
+	}
+	const weaponReqs = $derived(
+		['right', 'left'].flatMap((slot) => {
+			const w = $buildStore.weapons[slot as 'right' | 'left'];
+			if (!w) return [];
+			const reqs = reqsFor((w as { requiredAttributes?: { name: string; amount: number }[] }).requiredAttributes);
+			return reqs.length ? [{ label: w.name, image: w.image, reqs }] : [];
+		})
+	);
+	const spellReqs = $derived(
+		$buildStore.spells
+			.filter((s): s is NonNullable<typeof s> => s !== null)
+			.map((s) => ({ label: s.name, image: s.image, reqs: reqsFor((s as { requires?: { name: string; amount: number }[] }).requires) }))
+			.filter((s) => s.reqs.length > 0)
+	);
+
+	// Effets cumulés (talismans + armures special)
+	const passiveEffects = $derived.by(() => {
+		const out: { source: string; text: string; image?: string }[] = [];
+		for (const t of $buildStore.talismans) {
+			if (t?.effect) out.push({ source: t.name, text: t.effect, image: t.image });
+		}
+		for (const a of [$buildStore.armor.head, $buildStore.armor.chest, $buildStore.armor.hands, $buildStore.armor.legs]) {
+			const sp = (a as { ['special effect']?: string } | null)?.['special effect'];
+			if (a && sp) out.push({ source: a.name, text: String(sp), image: a.image });
+		}
+		return out;
+	});
+
 	// ── Lifecycle ──
 	onMount(async () => {
 		try {
@@ -344,14 +440,33 @@
 		<p class="text-parchment/40 font-cinzel tracking-[0.3em] text-xs uppercase">Build Creator</p>
 	</header>
 
-	<main class="max-w-7xl mx-auto px-4 pb-12">
-		<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-			<!-- Left column: Visual build editor -->
-			<div class="lg:col-span-2 space-y-6">
+	<main class="max-w-5xl mx-auto px-4 pb-24">
+		<div>
+			<div class="space-y-6">
 				<!-- Statistics -->
 				<section class="card">
-					<h2 class="section-title">Statistics</h2>
+					<div class="flex items-center justify-between">
+						<h2 class="section-title !mb-0">Statistics</h2>
+						<div class="flex items-center gap-2">
+							<span class="text-xs text-gold/60 font-cinzel tracking-widest uppercase">Lv</span>
+							<span class="font-cinzel text-gold text-xl">≈ {charLevel}</span>
+						</div>
+					</div>
 					<StatsPanel stats={$buildStore.stats} onstatchange={handleStatChange} />
+					{#if capWarnings.length}
+						<div class="flex flex-wrap gap-1 mt-3 pt-3 border-t border-gold/15">
+							<span class="text-[10px] text-parchment/40 font-cinzel uppercase tracking-widest mr-1">Caps reached:</span>
+							{#each capWarnings as w}
+								<span
+									class="text-[10px] font-cinzel rounded px-1.5 py-0.5 border
+										{w.status.level === 2 ? 'border-rose-400/50 text-rose-300 bg-rose-400/10' : 'border-amber-400/50 text-amber-300 bg-amber-400/10'}"
+									title={w.status.label}
+								>
+									{STAT_SHORT[w.stat]} {w.value} · {w.status.level === 2 ? 'hard' : 'soft'}
+								</span>
+							{/each}
+						</div>
+					{/if}
 				</section>
 
 				<!-- Equipment (armor + weapons + talismans) -->
@@ -363,12 +478,81 @@
 						talismans={$buildStore.talismans}
 						onslotclick={handleEquipmentSlotClick}
 					/>
+
+					<!-- Equip Load -->
+					<div class="mt-5 pt-4 border-t border-gold/15">
+						<div class="flex items-center justify-between mb-1">
+							<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase">Equip Load</h3>
+							<span class="font-cinzel text-sm" style="color:{ROLL_COLOR[equipRoll]}">{equipRoll}</span>
+						</div>
+						<div class="h-2.5 bg-dark-800 rounded overflow-hidden border border-dark-400/40">
+							<div class="h-full transition-all" style="width:{Math.min(100, equipRatio * 100).toFixed(1)}%; background:{ROLL_COLOR[equipRoll]};"></div>
+						</div>
+						<p class="text-[11px] text-parchment/50 font-cinzel mt-1 flex justify-between">
+							<span>{totalWeight.toFixed(1)} / {equipMax.toFixed(0)}</span>
+							<span class="text-parchment/30">{(equipRatio * 100).toFixed(0)} %</span>
+						</p>
+					</div>
+
+					<!-- Attack Power per weapon -->
+					{#if $buildStore.weapons.right || $buildStore.weapons.left}
+						<div class="mt-5 pt-4 border-t border-gold/15">
+							<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-3">Attack Power</h3>
+							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+								{#if $buildStore.weapons.right}
+									<AttackPowerPanel weapon={$buildStore.weapons.right} stats={$buildStore.stats} />
+								{/if}
+								{#if $buildStore.weapons.left}
+									<AttackPowerPanel weapon={$buildStore.weapons.left} stats={$buildStore.stats} />
+								{/if}
+							</div>
+						</div>
+					{/if}
+
+					<!-- Defense + Résistances -->
+					{#if hasArmor}
+						<div class="mt-5 pt-4 border-t border-gold/15 grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+							<div>
+								<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2 text-center">Damage Negation</h3>
+								<RadarChart labels={[...NEG_CATS]} values={negValues} size={220} />
+							</div>
+							<div>
+								<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2">Resistances</h3>
+								<BarList
+									items={RES_CATS.map((c, i) => ({ label: c.slice(0, 3), value: resValues[i] }))}
+									format={(n) => String(Math.round(n))}
+									labelWidth="2.5rem"
+								/>
+							</div>
+						</div>
+					{/if}
 				</section>
 
-				<!-- Ashes of War -->
+				<!-- Ashes of War + requirements armes -->
 				{#if $buildStore.weapons.right || $buildStore.weapons.left}
 					<section class="card">
 						<h2 class="section-title">Ashes of War</h2>
+						{#if weaponReqs.length}
+							<div class="mb-3 pb-3 border-b border-gold/15 space-y-1.5">
+								{#each weaponReqs as it}
+									<div class="flex items-center gap-2 text-xs">
+										{#if it.image}<img src={it.image} alt={it.label} class="w-5 h-5 object-contain bg-dark-900 rounded shrink-0" onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} />{/if}
+										<span class="text-parchment/70 truncate flex-1">{it.label}</span>
+										<div class="flex gap-1 shrink-0">
+											{#each it.reqs as r}
+												<span
+													class="text-[10px] font-cinzel rounded px-1 py-0.5 border
+														{r.ok ? 'border-emerald-400/40 text-emerald-300/90' : 'border-rose-400/50 text-rose-300 bg-rose-400/10'}"
+													title="Need {r.need}, have {r.have}"
+												>
+													{r.label} {r.have}/{r.need}
+												</span>
+											{/each}
+										</div>
+									</div>
+								{/each}
+							</div>
+						{/if}
 						<div class="space-y-2">
 							{#each ['right', 'left'] as const as slot}
 								{@const weapon = $buildStore.weapons[slot]}
@@ -409,17 +593,62 @@
 
 				<!-- Spells & Spirit -->
 				<section class="card">
-					<h2 class="section-title">Spells & Spirit</h2>
-					<p class="text-parchment/30 text-xs mb-4 -mt-2">
-						{totalSpellSlots} memory slot{totalSpellSlots !== 1 ? 's' : ''} used
-					</p>
+					<div class="flex items-center justify-between mb-2">
+						<h2 class="section-title !mb-0">Spells & Spirit</h2>
+						<span class="font-cinzel text-sm {slotsUsed > slotsAvail ? 'text-rose-300' : 'text-gold/80'}">
+							Memory: {slotsUsed} / {slotsAvail}
+						</span>
+					</div>
+					{#if slotsUsed > slotsAvail}
+						<p class="text-[11px] text-rose-300/80 italic mb-2">Not enough Mind to equip all spells.</p>
+					{/if}
 					<SpellGrid
 						spells={$buildStore.spells}
 						spirit={$buildStore.spirit}
 						onspellclick={handleSpellClick}
 						onspiritclick={handleSpiritClick}
 					/>
+					{#if spellReqs.length}
+						<div class="mt-4 pt-3 border-t border-gold/15 space-y-1.5">
+							<p class="text-[10px] text-parchment/40 font-cinzel uppercase tracking-widest mb-1">Spell Requirements</p>
+							{#each spellReqs as it}
+								<div class="flex items-center gap-2 text-xs">
+									{#if it.image}<img src={it.image} alt={it.label} class="w-5 h-5 object-contain bg-dark-900 rounded shrink-0" onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} />{/if}
+									<span class="text-parchment/70 truncate flex-1">{it.label}</span>
+									<div class="flex gap-1 shrink-0">
+										{#each it.reqs as r}
+											<span
+												class="text-[10px] font-cinzel rounded px-1 py-0.5 border
+													{r.ok ? 'border-emerald-400/40 text-emerald-300/90' : 'border-rose-400/50 text-rose-300 bg-rose-400/10'}"
+												title="Need {r.need}, have {r.have}"
+											>
+												{r.label} {r.have}/{r.need}
+											</span>
+										{/each}
+									</div>
+								</div>
+							{/each}
+						</div>
+					{/if}
 				</section>
+				<!-- Passive Effects (talismans + armures spéciales) -->
+				{#if passiveEffects.length}
+					<section class="card">
+						<h2 class="section-title">Passive Effects</h2>
+						<div class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-2">
+							{#each passiveEffects as e}
+								<div class="flex items-start gap-2">
+									{#if e.image}<img src={e.image} alt={e.source} class="w-6 h-6 object-contain bg-dark-900 rounded shrink-0 mt-0.5" onerror={(ev) => ((ev.currentTarget as HTMLImageElement).style.display = 'none')} />{/if}
+									<div class="min-w-0 flex-1">
+										<p class="text-parchment/80 text-xs truncate font-cinzel">{e.source}</p>
+										<p class="text-gold/50 text-[11px] italic">{e.text}</p>
+									</div>
+								</div>
+							{/each}
+						</div>
+					</section>
+				{/if}
+
 				<!-- Guide -->
 				<section class="card">
 					<h2 class="section-title">Guide</h2>
@@ -431,33 +660,27 @@
 				</section>
 			</div>
 
-			<!-- Right column: Build Summary -->
-			<aside class="lg:col-span-1 lg:sticky lg:top-4 lg:max-h-[calc(100vh-2rem)] flex flex-col gap-3">
-				<div class="flex-1 min-h-0 lg:overflow-y-auto pr-1">
-					<BuildSidebar build={$buildStore} />
-				</div>
-
-				<!-- Action buttons (toujours visibles, hors du scroll du recap) -->
-				<div class="card shrink-0 !py-3 flex gap-3">
-					<button class="btn-reset flex-1" onclick={() => buildStore.reset()}>
-						Reset
-					</button>
-					<button class="btn-gold flex-1" onclick={openSave} disabled={!hasBuild}>
-						{#if saved}
-							Saved!
-						{:else if loadedBuildId}
-							Update
-						{:else}
-							Save
-						{/if}
-					</button>
-					<button class="btn-gold flex-1" onclick={copyBuild} disabled={!hasBuild}>
-						{copied ? 'Copied!' : 'Copy JSON'}
-					</button>
-				</div>
-			</aside>
 		</div>
 	</main>
+
+	<!-- Action bar fixe en bas de viewport -->
+	<div class="fixed bottom-0 inset-x-0 z-40 bg-dark-900/95 backdrop-blur border-t border-gold/30">
+		<div class="max-w-2xl mx-auto px-4 py-2 flex gap-3">
+			<button class="btn-reset flex-1" onclick={() => buildStore.reset()}>Reset</button>
+			<button class="btn-gold flex-1" onclick={openSave} disabled={!hasBuild}>
+				{#if saved}
+					Saved!
+				{:else if loadedBuildId}
+					Update
+				{:else}
+					Save
+				{/if}
+			</button>
+			<button class="btn-gold flex-1" onclick={copyBuild} disabled={!hasBuild}>
+				{copied ? 'Copied!' : 'Copy JSON'}
+			</button>
+		</div>
+	</div>
 
 	<!-- Item Picker modal -->
 	<ItemPicker
