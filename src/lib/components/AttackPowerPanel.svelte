@@ -104,5 +104,18 @@
 			<span class="text-gold/70">AR Total</span>
 			<span class="text-gold text-base">{ar.total}</span>
 		</div>
+		{#if ar.contributions}
+			{@const contribs = (['Str', 'Dex', 'Int', 'Fai', 'Arc'] as const)
+				.map((s) => ({ stat: s, value: ar.contributions[s] }))
+				.filter((c) => c.value > 0.5)}
+			{#if contribs.length}
+				<div class="text-[10px] text-parchment/40 font-cinzel flex flex-wrap gap-x-2 gap-y-0.5 pt-1">
+					<span class="text-gold/40">via</span>
+					{#each contribs as c}
+						<span><span class="text-parchment/60">{c.stat}</span> +{Math.round(c.value)}</span>
+					{/each}
+				</div>
+			{/if}
+		{/if}
 	{/if}
 </div>
