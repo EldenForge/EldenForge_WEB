@@ -12,6 +12,7 @@
 	import RadarChart from '$lib/components/charts/RadarChart.svelte';
 	import BarList from '$lib/components/charts/BarList.svelte';
 	import IntentBadge from '$lib/components/IntentBadge.svelte';
+	import AttackPowerPanel from '$lib/components/AttackPowerPanel.svelte';
 	import { deserializeBuild, type BuildPayload } from '$lib/builds/serialize';
 	import type { AnyItem } from '$lib/stores/tooltip';
 	import type { Weapon } from '$lib/types';
@@ -317,14 +318,14 @@
 					</div>
 
 					<div>
-						<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2 text-center">Weapon Damage</h3>
+						<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2 text-center">Attack Power</h3>
 						{#if buildState.weapons.right}
-							<p class="text-parchment/50 text-[11px] mb-1 truncate">Right · {buildState.weapons.right.name}</p>
-							<BarList items={weaponDmgItems(buildState.weapons.right)} />
+							<p class="text-parchment/50 text-[11px] mb-1">Right hand</p>
+							<AttackPowerPanel weapon={buildState.weapons.right} stats={buildState.stats} />
 						{/if}
 						{#if buildState.weapons.left}
-							<p class="text-parchment/50 text-[11px] mt-3 mb-1 truncate">Left · {buildState.weapons.left.name}</p>
-							<BarList items={weaponDmgItems(buildState.weapons.left)} />
+							<p class="text-parchment/50 text-[11px] mt-3 mb-1">Left hand</p>
+							<AttackPowerPanel weapon={buildState.weapons.left} stats={buildState.stats} />
 						{/if}
 						{#if !hasWeapon}
 							<p class="text-parchment/30 text-xs italic text-center py-6 font-cinzel">No weapon equipped</p>

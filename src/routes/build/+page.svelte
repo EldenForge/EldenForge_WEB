@@ -21,6 +21,7 @@
 	import { authStore } from '$lib/stores/auth';
 	import AuthModal from '$lib/components/AuthModal.svelte';
 	import SaveBuildModal from '$lib/components/SaveBuildModal.svelte';
+	import AttackPowerPanel from '$lib/components/AttackPowerPanel.svelte';
 	import { serializeBuild, deserializeBuild, type BuildPayload } from '$lib/builds/serialize';
 	import { getBuild, type BuildIntent } from '$lib/api/builds';
 	import { page } from '$app/stores';
@@ -500,6 +501,23 @@
 								</div>
 							{/each}
 						</div>
+
+						<!-- Attack Power (live) -->
+						{#if $buildStore.weapons.right || $buildStore.weapons.left}
+							<div class="mb-5">
+								<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2">
+									Attack Power
+								</h3>
+								<div class="space-y-3">
+									{#if $buildStore.weapons.right}
+										<AttackPowerPanel weapon={$buildStore.weapons.right} stats={$buildStore.stats} />
+									{/if}
+									{#if $buildStore.weapons.left}
+										<AttackPowerPanel weapon={$buildStore.weapons.left} stats={$buildStore.stats} />
+									{/if}
+								</div>
+							</div>
+						{/if}
 
 						<!-- Spells summary -->
 						{#if $buildStore.spells.some((s) => s !== null)}

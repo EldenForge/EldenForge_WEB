@@ -51,6 +51,32 @@ export async function fetchSpirits(): Promise<Spirit[]> {
 	return spiritCache;
 }
 
+export interface UpgradeRow {
+	level: number;
+	upgrade: string;
+	attack: { Phy: number; Mag: number; Fire: number; Ligt: number; Holy: number };
+	scaling: { Str: string | null; Dex: string | null; Int: string | null; Fai: string | null; Arc: string | null };
+	guard?: { Phy?: number; Mag?: number; Fire?: number; Ligt?: number; Holy?: number; Boost?: number };
+}
+
+const upgradeCache = new Map<string, UpgradeRow[]>();
+
+export async function fetchWeaponUpgrades(weaponId: string): Promise<UpgradeRow[]> {
+	const cached = upgradeCache.get(`w:${weaponId}`);
+	if (cached) return cached;
+	const rows = await get<UpgradeRow[]>(`/weapons/${weaponId}/upgrades`);
+	upgradeCache.set(`w:${weaponId}`, rows);
+	return rows;
+}
+
+export async function fetchShieldUpgrades(shieldId: string): Promise<UpgradeRow[]> {
+	const cached = upgradeCache.get(`s:${shieldId}`);
+	if (cached) return cached;
+	const rows = await get<UpgradeRow[]>(`/shields/${shieldId}/upgrades`);
+	upgradeCache.set(`s:${shieldId}`, rows);
+	return rows;
+}
+
 export async function loadAllItems() {
 	const [armors, talismans, weapons, shields, sorceries, incantations, spirits] =
 		await Promise.all([
