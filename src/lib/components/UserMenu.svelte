@@ -46,16 +46,23 @@
 					shadow-xl shadow-black/50 overflow-hidden z-30"
 			>
 				<a
-					href="/profile"
+					href="/u/{encodeURIComponent($authStore.user.pseudo)}"
 					onclick={() => (dropdownOpen = false)}
 					class="block px-4 py-2 text-sm text-parchment hover:bg-dark-600 hover:text-gold transition-colors"
 				>
-					Profile
+					My profile
+				</a>
+				<a
+					href="/profile"
+					onclick={() => (dropdownOpen = false)}
+					class="block px-4 py-2 text-sm text-parchment hover:bg-dark-600 hover:text-gold transition-colors border-t border-dark-500"
+				>
+					Settings
 				</a>
 				<button
 					type="button"
 					onclick={handleLogout}
-					class="w-full text-left px-4 py-2 text-sm text-parchment hover:bg-dark-600 hover:text-red-400 transition-colors cursor-pointer"
+					class="w-full text-left px-4 py-2 text-sm text-parchment hover:bg-dark-600 hover:text-red-400 transition-colors cursor-pointer border-t border-dark-500"
 				>
 					Logout
 				</button>
