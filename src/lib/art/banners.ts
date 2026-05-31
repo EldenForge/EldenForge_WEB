@@ -187,14 +187,6 @@ export const BANNERS: Banner[] = [
 		game: "shadow_of_the_erdtree",
 		type: "screenshot"
 	},
-	{
-		path: "/art/banners/shadow-of-the-erdtree-collector-edition-messmer-promo.jpg",
-		name: "Shadow of the Erdtree Collector Edition Messmer Promo",
-		source: "https://us-east-1-bandai.graphassets.com/AXzioIclSWilEjFtsMJPwz/hlpdWmnJQ9eIJBSTCoCy",
-		copyright: "ELDEN RING Shadow of the Erdtree\u2122 & \u00a9BANDAI NAMCO Entertainment Inc. / \u00a92024 FromSoftware, Inc.",
-		game: "shadow_of_the_erdtree",
-		type: "promo_art"
-	},
 ];
 
 /** Stable hash → pick a banner deterministically from a string (e.g. pseudo). */

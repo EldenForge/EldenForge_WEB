@@ -34,9 +34,9 @@ SOURCES = ROOT / "static" / "art" / "sources.json"
 OUT_DIR = ROOT / "static" / "art" / "banners"
 TS_OUT = ROOT / "src" / "lib" / "art" / "banners.ts"
 
-# Types qu'on garde : screenshots de jeu + hero shots + promo art (Messmer collector).
-# On retire backgrounds (Steam pages), wallpapers, key_arts (= boxart-ish) trop statiques.
-KEEP_TYPES = {"screenshot", "hero", "promo_art"}
+# Types qu'on garde : screenshots de jeu + hero shots.
+# On retire backgrounds (Steam pages), wallpapers, key_arts, promo_art (= boxart-ish) trop statiques.
+KEEP_TYPES = {"screenshot", "hero"}
 
 # Skip explicites par pattern d'URL.
 SKIP_NAME_PATTERNS = [
