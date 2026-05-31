@@ -32,7 +32,13 @@
 	</div>
 {:else if style === 'vitrail'}
 	<div class="fixed inset-0 -z-10 pointer-events-none">
-		<img src={bannerPath} alt="" aria-hidden="true" class="w-full h-full object-cover" />
+		<img
+			src={bannerPath}
+			alt=""
+			aria-hidden="true"
+			class="w-full h-full object-cover"
+			style="filter: blur(3px);"
+		/>
 		<div class="absolute inset-0" style="background: radial-gradient(ellipse at center, rgb(0 0 0 / 0.45) 25%, rgb(20 18 14 / 0.92) 80%);"></div>
 	</div>
 {:else if style === 'hero'}
