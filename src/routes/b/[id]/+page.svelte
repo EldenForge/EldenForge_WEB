@@ -29,9 +29,16 @@
 
 	const id = $derived($page.params.id as string);
 
-	const buildState = $derived(
+	const multiBuild = $derived(
 		build && lookups ? deserializeBuild(build.data as unknown as BuildPayload, lookups) : null
 	);
+	let viewIndex = $state<number | null>(null);
+	const buildState = $derived.by(() => {
+		if (!multiBuild) return null;
+		const idx = viewIndex ?? multiBuild.activeIndex;
+		const safe = Math.max(0, Math.min(multiBuild.loadouts.length - 1, idx));
+		return multiBuild.loadouts[safe] ?? null;
+	});
 
 	// ── Données pour les graphes ──
 	const statLabels = ['Vig', 'Mnd', 'End', 'Str', 'Dex', 'Int', 'Fai', 'Arc'];
@@ -197,8 +204,8 @@
 		}
 	}
 
-	const stats = $derived(build?.data?.stats as Record<string, number> | undefined);
-	const guide = $derived(build?.data?.guide as string | undefined);
+	const stats = $derived(buildState?.stats as Record<string, number> | undefined);
+	const guide = $derived(buildState?.guide as string | undefined);
 
 	onMount(() => {
 		load();
@@ -298,6 +305,23 @@
 			<section class="card mb-4">
 				<h2 class="section-title">Description</h2>
 				<p class="text-parchment/80 text-sm whitespace-pre-wrap">{build.description}</p>
+			</section>
+		{/if}
+
+		{#if multiBuild && multiBuild.loadouts.length > 1}
+			<section class="card !p-2 mb-4">
+				<div class="flex items-center gap-1 flex-wrap">
+					{#each multiBuild.loadouts as l, i (i)}
+						{@const idx = viewIndex ?? multiBuild.activeIndex}
+						{@const isActive = i === idx}
+						<button
+							type="button"
+							onclick={() => (viewIndex = i)}
+							class="px-3 py-1 text-xs font-cinzel tracking-wider border rounded transition-colors
+								{isActive ? 'bg-gold/10 border-gold/40 text-gold' : 'bg-dark-800 border-dark-400 text-parchment/70 hover:border-gold/30'}"
+						>{l.name}</button>
+					{/each}
+				</div>
 			</section>
 		{/if}
 

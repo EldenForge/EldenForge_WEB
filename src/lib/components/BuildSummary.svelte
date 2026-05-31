@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type { BuildState } from '$lib/types';
+	import type { Loadout } from '$lib/types';
 	import { tooltipStore, type AnyItem } from '$lib/stores/tooltip';
 
 	interface Props {
-		build: BuildState;
+		build: Loadout;
 	}
 
 	let { build }: Props = $props();

@@ -117,7 +117,9 @@ export interface Ammo {
 	[key: string]: unknown;
 }
 
-export interface BuildState {
+/** Une page d'equipement+stats+guide. Un build peut contenir plusieurs Loadouts. */
+export interface Loadout {
+	name: string;
 	stats: CharacterStats;
 	armor: {
 		head: Armor | null;
@@ -145,4 +147,9 @@ export interface BuildState {
 	spells: (Spell | null)[];
 	spirit: Spirit | null;
 	guide: string;
+}
+
+export interface BuildState {
+	loadouts: Loadout[];   // au moins une page (la 1ere est l'active par defaut)
+	activeIndex: number;
 }

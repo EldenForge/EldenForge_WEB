@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { buildStore } from '$lib/stores/build';
+	import { buildStore, activeLoadout } from '$lib/stores/build';
 	import { loadAllItems } from '$lib/api/items';
 	import type {
 		Armor,
@@ -67,6 +67,24 @@
 	let loadedBuildId = $state<string | null>(null);
 	let loadedBuildMeta = $state<{ name: string; description: string | null; is_public: boolean; tags: string[]; intent: BuildIntent } | null>(null);
 
+	// Loadout tabs : edition du nom inline
+	let renamingIndex = $state<number | null>(null);
+	let renameDraft = $state('');
+	function startRename(i: number) {
+		renamingIndex = i;
+		renameDraft = $buildStore.loadouts[i]?.name ?? '';
+	}
+	function commitRename() {
+		if (renamingIndex !== null) {
+			const trimmed = renameDraft.trim() || `Page ${renamingIndex + 1}`;
+			buildStore.renameLoadout(renamingIndex, trimmed.slice(0, 30));
+		}
+		renamingIndex = null;
+	}
+	function cancelRename() {
+		renamingIndex = null;
+	}
+
 	// ── Derived item lists ──
 	let headArmors = $derived(armors.filter((a) => a.category === 'Helm'));
 	let chestArmors = $derived(armors.filter((a) => a.category === 'Chest Armor'));
@@ -121,7 +139,7 @@
 			};
 			const info = slotMap[slot];
 			if (!info) return;
-			const currentId = $buildStore.armor[slot as keyof typeof $buildStore.armor]?.id ?? null;
+			const currentId = $activeLoadout.armor[slot as keyof typeof $activeLoadout.armor]?.id ?? null;
 			openPicker(info.label, info.list, currentId, (item) => {
 				buildStore.setArmor(
 					slot as 'head' | 'chest' | 'hands' | 'legs',
@@ -133,7 +151,7 @@
 			const isLeft = slot === 'left';
 			const label = isLeft ? 'Left Hand' : 'Right Hand';
 			const list = isLeft ? leftHandOptions : weapons;
-			const currentId = $buildStore.weapons[slot as 'right' | 'left']?.id ?? null;
+			const currentId = $activeLoadout.weapons[slot as 'right' | 'left']?.id ?? null;
 			openPicker(label, list, currentId, (item) => {
 				buildStore.setWeapon(
 					slot as 'right' | 'left',
@@ -143,7 +161,7 @@
 			});
 		} else if (category === 'talisman') {
 			const idx = parseInt(slot);
-			const currentId = $buildStore.talismans[idx]?.id ?? null;
+			const currentId = $activeLoadout.talismans[idx]?.id ?? null;
 			openPicker(`Talisman ${idx + 1}`, talismans, currentId, (item) => {
 				buildStore.setTalisman(idx, item ? (talismans.find((t) => t.id === item.id) ?? null) : null);
 				closePicker();
@@ -152,7 +170,7 @@
 	}
 
 	function handleSpellClick(index: number) {
-		const currentId = $buildStore.spells[index]?.id ?? null;
+		const currentId = $activeLoadout.spells[index]?.id ?? null;
 		openPicker(`Spell ${index + 1}`, allSpells, currentId, (item) => {
 			buildStore.setSpell(index, item ? (allSpells.find((s) => s.id === item.id) ?? null) : null);
 			closePicker();
@@ -160,7 +178,7 @@
 	}
 
 	function handleSpiritClick() {
-		const currentId = $buildStore.spirit?.id ?? null;
+		const currentId = $activeLoadout.spirit?.id ?? null;
 		openPicker('Spirit Ashes', spirits, currentId, (item) => {
 			buildStore.setSpirit(item ? (spirits.find((s) => s.id === item.id) ?? null) : null);
 			closePicker();
@@ -168,8 +186,8 @@
 	}
 
 	function handleAshClick(slot: 'right' | 'left') {
-		const currentId = $buildStore.ashes[slot]?.id ?? null;
-		const weaponName = $buildStore.weapons[slot]?.name ?? '';
+		const currentId = $activeLoadout.ashes[slot]?.id ?? null;
+		const weaponName = $activeLoadout.weapons[slot]?.name ?? '';
 		openPicker(`Ash of War — ${weaponName || slot}`, ashes, currentId, (item) => {
 			buildStore.setAsh(slot, item ? (ashes.find((a) => a.id === item.id) ?? null) : null);
 			closePicker();
@@ -179,7 +197,7 @@
 	function handleSecondaryWeapon(side: 'right' | 'left', idx: 0 | 1) {
 		const list = side === 'left' ? leftHandOptions : weapons;
 		const key = side === 'right' ? 'rightSecondary' : 'leftSecondary';
-		const currentId = $buildStore.weapons[key][idx]?.id ?? null;
+		const currentId = $activeLoadout.weapons[key][idx]?.id ?? null;
 		const label = `${side === 'right' ? 'Right' : 'Left'} secondary ${idx + 1}`;
 		openPicker(label, list, currentId, (item) => {
 			buildStore.setSecondaryWeapon(side, idx, item ? (list.find((w) => w.id === item.id) ?? null) : null);
@@ -189,8 +207,8 @@
 
 	function handleSecondaryAsh(side: 'right' | 'left', idx: 0 | 1) {
 		const key = side === 'right' ? 'rightSecondary' : 'leftSecondary';
-		const currentId = $buildStore.ashes[key][idx]?.id ?? null;
-		const wname = $buildStore.weapons[key][idx]?.name ?? `${side} secondary ${idx + 1}`;
+		const currentId = $activeLoadout.ashes[key][idx]?.id ?? null;
+		const wname = $activeLoadout.weapons[key][idx]?.name ?? `${side} secondary ${idx + 1}`;
 		openPicker(`Ash of War — ${wname}`, ashes, currentId, (item) => {
 			buildStore.setSecondaryAsh(side, idx, item ? (ashes.find((a) => a.id === item.id) ?? null) : null);
 			closePicker();
@@ -203,7 +221,7 @@
 
 	function handleAmmo(kind: 'arrows' | 'bolts', idx: 0 | 1) {
 		const list = kind === 'arrows' ? arrowOptions : boltOptions;
-		const currentId = $buildStore.ammos[kind][idx]?.id ?? null;
+		const currentId = $activeLoadout.ammos[kind][idx]?.id ?? null;
 		const label = `${kind === 'arrows' ? 'Arrows' : 'Bolts'} ${idx + 1}`;
 		openPicker(label, list, currentId, (item) => {
 			buildStore.setAmmo(kind, idx, item ? (list.find((a) => a.id === item.id) ?? null) : null);
@@ -228,28 +246,28 @@
 	];
 
 	let totalWeight = $derived(
-		($buildStore.armor.head?.weight ?? 0) +
-			($buildStore.armor.chest?.weight ?? 0) +
-			($buildStore.armor.hands?.weight ?? 0) +
-			($buildStore.armor.legs?.weight ?? 0) +
-			($buildStore.weapons.right?.weight ?? 0) +
-			($buildStore.weapons.left?.weight ?? 0)
+		($activeLoadout.armor.head?.weight ?? 0) +
+			($activeLoadout.armor.chest?.weight ?? 0) +
+			($activeLoadout.armor.hands?.weight ?? 0) +
+			($activeLoadout.armor.legs?.weight ?? 0) +
+			($activeLoadout.weapons.right?.weight ?? 0) +
+			($activeLoadout.weapons.left?.weight ?? 0)
 	);
 
 	let totalSpellSlots = $derived(
-		$buildStore.spells.reduce((sum, s) => sum + (s ? (s.slots ?? 1) : 0), 0)
+		$activeLoadout.spells.reduce((sum, s) => sum + (s ? (s.slots ?? 1) : 0), 0)
 	);
 
 	let hasBuild = $derived(
-		$buildStore.armor.head !== null ||
-			$buildStore.armor.chest !== null ||
-			$buildStore.armor.hands !== null ||
-			$buildStore.armor.legs !== null ||
-			$buildStore.talismans.some((t) => t !== null) ||
-			$buildStore.weapons.right !== null ||
-			$buildStore.weapons.left !== null ||
-			$buildStore.spells.some((s) => s !== null) ||
-			$buildStore.spirit !== null
+		$activeLoadout.armor.head !== null ||
+			$activeLoadout.armor.chest !== null ||
+			$activeLoadout.armor.hands !== null ||
+			$activeLoadout.armor.legs !== null ||
+			$activeLoadout.talismans.some((t) => t !== null) ||
+			$activeLoadout.weapons.right !== null ||
+			$activeLoadout.weapons.left !== null ||
+			$activeLoadout.spells.some((s) => s !== null) ||
+			$activeLoadout.spirit !== null
 	);
 
 	// ── Indicateurs d'aide à la décision (calculés en live) ──
@@ -258,25 +276,25 @@
 		vigor:'Vig',mind:'Mnd',endurance:'End',strength:'Str',dexterity:'Dex',intelligence:'Int',faith:'Fai',arcane:'Arc'
 	};
 
-	const charLevel = $derived(characterLevel($buildStore.stats));
+	const charLevel = $derived(characterLevel($activeLoadout.stats));
 	const capWarnings = $derived(
-		STATS_KEYS.map((s) => ({ stat: s, value: $buildStore.stats[s], status: softCapStatus(s, $buildStore.stats[s]) }))
+		STATS_KEYS.map((s) => ({ stat: s, value: $activeLoadout.stats[s], status: softCapStatus(s, $activeLoadout.stats[s]) }))
 			.filter((x) => x.status.level > 0)
 	);
 
-	const equipMax = $derived(maxEquipLoad($buildStore.stats.endurance));
+	const equipMax = $derived(maxEquipLoad($activeLoadout.stats.endurance));
 	const equipRatio = $derived(totalWeight / equipMax);
 	const equipRoll = $derived(rollCategory(equipRatio));
 
-	const slotsAvail = $derived(memorySlotsFromMind($buildStore.stats.mind));
-	const slotsUsed = $derived($buildStore.spells.reduce((s, sp) => s + (sp ? sp.slots ?? 1 : 0), 0));
+	const slotsAvail = $derived(memorySlotsFromMind($activeLoadout.stats.mind));
+	const slotsUsed = $derived($activeLoadout.spells.reduce((s, sp) => s + (sp ? sp.slots ?? 1 : 0), 0));
 
 	// Defense + Resistances (armure totale)
 	const NEG_CATS = ['Phy','Strike','Slash','Pierce','Magic','Fire','Ligt','Holy'] as const;
 	const RES_CATS = ['Immunity','Robustness','Focus','Vitality','Poise'] as const;
 	const negValues = $derived.by(() => {
 		const sums: Record<string, number> = Object.fromEntries(NEG_CATS.map((c) => [c, 0]));
-		for (const piece of [$buildStore.armor.head, $buildStore.armor.chest, $buildStore.armor.hands, $buildStore.armor.legs]) {
+		for (const piece of [$activeLoadout.armor.head, $activeLoadout.armor.chest, $activeLoadout.armor.hands, $activeLoadout.armor.legs]) {
 			if (!piece) continue;
 			const arr = (piece as { dmgNegation?: { name: string; amount: number | string }[] }).dmgNegation;
 			if (!Array.isArray(arr)) continue;
@@ -286,7 +304,7 @@
 	});
 	const resValues = $derived.by(() => {
 		const sums: Record<string, number> = Object.fromEntries(RES_CATS.map((c) => [c, 0]));
-		for (const piece of [$buildStore.armor.head, $buildStore.armor.chest, $buildStore.armor.hands, $buildStore.armor.legs]) {
+		for (const piece of [$activeLoadout.armor.head, $activeLoadout.armor.chest, $activeLoadout.armor.hands, $activeLoadout.armor.legs]) {
 			if (!piece) continue;
 			const arr = (piece as { resistance?: { name: string; amount: number | string }[] }).resistance;
 			if (!Array.isArray(arr)) continue;
@@ -294,7 +312,7 @@
 		}
 		return RES_CATS.map((c) => sums[c]);
 	});
-	const hasArmor = $derived(!!($buildStore.armor.head || $buildStore.armor.chest || $buildStore.armor.hands || $buildStore.armor.legs));
+	const hasArmor = $derived(!!($activeLoadout.armor.head || $activeLoadout.armor.chest || $activeLoadout.armor.hands || $activeLoadout.armor.legs));
 
 	// Requirements check (par item équipé qui a des requis)
 	function reqsFor(raw: { name: string; amount: number | string }[] | undefined) {
@@ -305,18 +323,18 @@
 				if (!k) return null;
 				const need = Number(r.amount) || 0;
 				if (need <= 0) return null;
-				const have = $buildStore.stats[k];
+				const have = $activeLoadout.stats[k];
 				return { stat: k, need, have, ok: have >= need, label: STAT_SHORT[k as (typeof STATS_KEYS)[number]] ?? k };
 			})
 			.filter((x): x is NonNullable<typeof x> => x !== null);
 	}
 	// Toutes les armes équipées (primaires + secondaires) pour AR & requirements
 	const allEquippedWeapons = $derived.by(() => {
-		const list: { weapon: NonNullable<typeof $buildStore.weapons.right>; label: string }[] = [];
-		if ($buildStore.weapons.right) list.push({ weapon: $buildStore.weapons.right, label: 'Right primary' });
-		$buildStore.weapons.rightSecondary.forEach((w, i) => { if (w) list.push({ weapon: w, label: `Right secondary ${i + 1}` }); });
-		if ($buildStore.weapons.left) list.push({ weapon: $buildStore.weapons.left, label: 'Left primary' });
-		$buildStore.weapons.leftSecondary.forEach((w, i) => { if (w) list.push({ weapon: w, label: `Left secondary ${i + 1}` }); });
+		const list: { weapon: NonNullable<typeof $activeLoadout.weapons.right>; label: string }[] = [];
+		if ($activeLoadout.weapons.right) list.push({ weapon: $activeLoadout.weapons.right, label: 'Right primary' });
+		$activeLoadout.weapons.rightSecondary.forEach((w, i) => { if (w) list.push({ weapon: w, label: `Right secondary ${i + 1}` }); });
+		if ($activeLoadout.weapons.left) list.push({ weapon: $activeLoadout.weapons.left, label: 'Left primary' });
+		$activeLoadout.weapons.leftSecondary.forEach((w, i) => { if (w) list.push({ weapon: w, label: `Left secondary ${i + 1}` }); });
 		return list;
 	});
 
@@ -327,7 +345,7 @@
 		})
 	);
 	const spellReqs = $derived(
-		$buildStore.spells
+		$activeLoadout.spells
 			.filter((s): s is NonNullable<typeof s> => s !== null)
 			.map((s) => ({ label: s.name, image: s.image, reqs: reqsFor((s as { requires?: { name: string; amount: number }[] }).requires) }))
 			.filter((s) => s.reqs.length > 0)
@@ -336,10 +354,10 @@
 	// Effets cumulés (talismans + armures special)
 	const passiveEffects = $derived.by(() => {
 		const out: { source: string; text: string; image?: string }[] = [];
-		for (const t of $buildStore.talismans) {
+		for (const t of $activeLoadout.talismans) {
 			if (t?.effect) out.push({ source: t.name, text: t.effect, image: t.image });
 		}
-		for (const a of [$buildStore.armor.head, $buildStore.armor.chest, $buildStore.armor.hands, $buildStore.armor.legs]) {
+		for (const a of [$activeLoadout.armor.head, $activeLoadout.armor.chest, $activeLoadout.armor.hands, $activeLoadout.armor.legs]) {
 			const sp = (a as { ['special effect']?: string } | null)?.['special effect'];
 			if (a && sp) out.push({ source: a.name, text: String(sp), image: a.image });
 		}
@@ -423,7 +441,7 @@
 
 	// ── Export build ──
 	async function copyBuild() {
-		const b = $buildStore;
+		const b = $activeLoadout;
 		const json = JSON.stringify(
 			{
 				stats: b.stats,
@@ -490,6 +508,55 @@
 	<main class="max-w-5xl mx-auto px-4 pb-24">
 		<div>
 			<div class="space-y-6">
+				<!-- Loadout tabs -->
+				<section class="card !p-2">
+					<div class="flex items-center gap-1 flex-wrap">
+						{#each $buildStore.loadouts as l, i (i)}
+							{@const isActive = i === $buildStore.activeIndex}
+							<div class="flex items-center {isActive ? 'bg-gold/10 border-gold/40' : 'bg-dark-800 border-dark-400 hover:border-gold/30'} border rounded transition-colors">
+								{#if isActive && renamingIndex === i}
+									<input
+										type="text"
+										bind:value={renameDraft}
+										onkeydown={(e) => { if (e.key === 'Enter') commitRename(); if (e.key === 'Escape') cancelRename(); }}
+										onblur={commitRename}
+										class="bg-transparent text-gold text-xs font-cinzel tracking-wider px-2 py-1 outline-none w-28"
+										aria-label="Rename page"
+									/>
+								{:else}
+									<button
+										type="button"
+										onclick={() => isActive ? startRename(i) : buildStore.setActiveLoadout(i)}
+										class="px-2.5 py-1 text-xs font-cinzel tracking-wider {isActive ? 'text-gold' : 'text-parchment/70'}"
+										title={isActive ? 'Click to rename' : 'Switch to this page'}
+									>{l.name}</button>
+								{/if}
+								{#if isActive && $buildStore.loadouts.length > 1}
+									<button
+										type="button"
+										onclick={() => buildStore.removeLoadout(i)}
+										aria-label="Delete page"
+										title="Delete page"
+										class="text-parchment/40 hover:text-red-400 text-sm px-1.5"
+									>&times;</button>
+								{/if}
+							</div>
+						{/each}
+						<button
+							type="button"
+							onclick={() => buildStore.addLoadout()}
+							class="px-2.5 py-1 text-xs font-cinzel tracking-wider text-gold/60 hover:text-gold border border-dashed border-gold/30 hover:border-gold/60 rounded transition-colors"
+							title="Add a new page"
+						>+ Page</button>
+						<button
+							type="button"
+							onclick={() => buildStore.duplicateLoadout($buildStore.activeIndex)}
+							class="px-2.5 py-1 text-xs font-cinzel tracking-wider text-gold/60 hover:text-gold border border-dashed border-gold/30 hover:border-gold/60 rounded transition-colors"
+							title="Duplicate current page"
+						>Duplicate</button>
+					</div>
+				</section>
+
 				<!-- Statistics -->
 				<section class="card">
 					<div class="flex items-center justify-between">
@@ -499,7 +566,7 @@
 							<span class="font-cinzel text-gold text-xl">≈ {charLevel}</span>
 						</div>
 					</div>
-					<StatsPanel stats={$buildStore.stats} onstatchange={handleStatChange} />
+					<StatsPanel stats={$activeLoadout.stats} onstatchange={handleStatChange} />
 					{#if capWarnings.length}
 						<div class="flex flex-wrap gap-1 mt-3 pt-3 border-t border-gold/15">
 							<span class="text-[10px] text-parchment/40 font-cinzel uppercase tracking-widest mr-1">Caps reached:</span>
@@ -520,9 +587,9 @@
 				<section class="card">
 					<h2 class="section-title">Equipment</h2>
 					<EquipmentFrame
-						armor={$buildStore.armor}
-						weapons={$buildStore.weapons}
-						talismans={$buildStore.talismans}
+						armor={$activeLoadout.armor}
+						weapons={$activeLoadout.weapons}
+						talismans={$activeLoadout.talismans}
 						onslotclick={handleEquipmentSlotClick}
 					/>
 
@@ -611,8 +678,8 @@
 						<div class="grid grid-cols-2 md:grid-cols-4 gap-2">
 							{@render weaponMini(
 								'Right 2',
-								$buildStore.weapons.rightSecondary[0],
-								$buildStore.ashes.rightSecondary[0],
+								$activeLoadout.weapons.rightSecondary[0],
+								$activeLoadout.ashes.rightSecondary[0],
 								() => handleSecondaryWeapon('right', 0),
 								() => buildStore.setSecondaryWeapon('right', 0, null),
 								() => handleSecondaryAsh('right', 0),
@@ -620,8 +687,8 @@
 							)}
 							{@render weaponMini(
 								'Right 3',
-								$buildStore.weapons.rightSecondary[1],
-								$buildStore.ashes.rightSecondary[1],
+								$activeLoadout.weapons.rightSecondary[1],
+								$activeLoadout.ashes.rightSecondary[1],
 								() => handleSecondaryWeapon('right', 1),
 								() => buildStore.setSecondaryWeapon('right', 1, null),
 								() => handleSecondaryAsh('right', 1),
@@ -629,8 +696,8 @@
 							)}
 							{@render weaponMini(
 								'Left 2',
-								$buildStore.weapons.leftSecondary[0],
-								$buildStore.ashes.leftSecondary[0],
+								$activeLoadout.weapons.leftSecondary[0],
+								$activeLoadout.ashes.leftSecondary[0],
 								() => handleSecondaryWeapon('left', 0),
 								() => buildStore.setSecondaryWeapon('left', 0, null),
 								() => handleSecondaryAsh('left', 0),
@@ -638,8 +705,8 @@
 							)}
 							{@render weaponMini(
 								'Left 3',
-								$buildStore.weapons.leftSecondary[1],
-								$buildStore.ashes.leftSecondary[1],
+								$activeLoadout.weapons.leftSecondary[1],
+								$activeLoadout.ashes.leftSecondary[1],
 								() => handleSecondaryWeapon('left', 1),
 								() => buildStore.setSecondaryWeapon('left', 1, null),
 								() => handleSecondaryAsh('left', 1),
@@ -652,10 +719,10 @@
 					<div class="mt-4 pt-4 border-t border-gold/15">
 						<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-2">Ammunition</h3>
 						<div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-							{@render ammoMini('Arrow 1', $buildStore.ammos.arrows[0], () => handleAmmo('arrows', 0), () => buildStore.setAmmo('arrows', 0, null))}
-							{@render ammoMini('Arrow 2', $buildStore.ammos.arrows[1], () => handleAmmo('arrows', 1), () => buildStore.setAmmo('arrows', 1, null))}
-							{@render ammoMini('Bolt 1', $buildStore.ammos.bolts[0], () => handleAmmo('bolts', 0), () => buildStore.setAmmo('bolts', 0, null))}
-							{@render ammoMini('Bolt 2', $buildStore.ammos.bolts[1], () => handleAmmo('bolts', 1), () => buildStore.setAmmo('bolts', 1, null))}
+							{@render ammoMini('Arrow 1', $activeLoadout.ammos.arrows[0], () => handleAmmo('arrows', 0), () => buildStore.setAmmo('arrows', 0, null))}
+							{@render ammoMini('Arrow 2', $activeLoadout.ammos.arrows[1], () => handleAmmo('arrows', 1), () => buildStore.setAmmo('arrows', 1, null))}
+							{@render ammoMini('Bolt 1', $activeLoadout.ammos.bolts[0], () => handleAmmo('bolts', 0), () => buildStore.setAmmo('bolts', 0, null))}
+							{@render ammoMini('Bolt 2', $activeLoadout.ammos.bolts[1], () => handleAmmo('bolts', 1), () => buildStore.setAmmo('bolts', 1, null))}
 						</div>
 					</div>
 
@@ -701,7 +768,7 @@
 							<h3 class="text-xs text-gold/60 font-cinzel tracking-widest uppercase mb-3">Attack Power</h3>
 							<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 								{#each allEquippedWeapons as w}
-									<AttackPowerPanel weapon={w.weapon} stats={$buildStore.stats} />
+									<AttackPowerPanel weapon={w.weapon} stats={$activeLoadout.stats} />
 								{/each}
 							</div>
 						</div>
@@ -727,7 +794,7 @@
 				</section>
 
 				<!-- Ashes of War + requirements armes -->
-				{#if $buildStore.weapons.right || $buildStore.weapons.left}
+				{#if $activeLoadout.weapons.right || $activeLoadout.weapons.left}
 					<section class="card">
 						<h2 class="section-title">Ashes of War</h2>
 						{#if weaponReqs.length}
@@ -753,8 +820,8 @@
 						{/if}
 						<div class="space-y-2">
 							{#each ['right', 'left'] as const as slot}
-								{@const weapon = $buildStore.weapons[slot]}
-								{@const ash = $buildStore.ashes[slot]}
+								{@const weapon = $activeLoadout.weapons[slot]}
+								{@const ash = $activeLoadout.ashes[slot]}
 								{#if weapon}
 									<div class="flex items-center gap-3 py-1.5 border-b border-dark-400/40 last:border-0">
 										<span class="text-parchment/50 text-xs font-cinzel w-12 shrink-0 capitalize">{slot}</span>
@@ -801,8 +868,8 @@
 						<p class="text-[11px] text-rose-300/80 italic mb-2">Not enough Mind to equip all spells.</p>
 					{/if}
 					<SpellGrid
-						spells={$buildStore.spells}
-						spirit={$buildStore.spirit}
+						spells={$activeLoadout.spells}
+						spirit={$activeLoadout.spirit}
 						onspellclick={handleSpellClick}
 						onspiritclick={handleSpiritClick}
 					/>
@@ -851,7 +918,7 @@
 				<section class="card">
 					<h2 class="section-title">Guide</h2>
 					<GuideEditor
-						guide={$buildStore.guide}
+						guide={$activeLoadout.guide}
 						allItems={allGuideItems}
 						onchange={(text) => buildStore.setGuide(text)}
 					/>

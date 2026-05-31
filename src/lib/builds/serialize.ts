@@ -9,11 +9,13 @@ import type {
 	AshOfWar,
 	Ammo,
 	BuildState,
+	Loadout,
 	CharacterStats
 } from '$lib/types';
 
-/** Compact ID-only representation that goes into the server's `data` JSONB. */
-export interface BuildPayload {
+/** Une page d'equipement serialisee (ids seulement, pas les objets entiers). */
+export interface LoadoutPayload {
+	name: string;
 	stats: CharacterStats;
 	armor: { head: string | null; chest: string | null; hands: string | null; legs: string | null };
 	talismans: (string | null)[];
@@ -29,44 +31,82 @@ export interface BuildPayload {
 		rightSecondary?: (string | null)[];
 		leftSecondary?: (string | null)[];
 	};
-	ammos?: {
-		arrows?: (string | null)[];
-		bolts?: (string | null)[];
-	};
+	ammos?: { arrows?: (string | null)[]; bolts?: (string | null)[] };
 	spells: (string | null)[];
 	spirit: string | null;
 	guide: string;
 }
 
-export function serializeBuild(state: BuildState): BuildPayload {
+/** Payload v2 : plusieurs pages. */
+export interface BuildPayloadV2 {
+	v: 2;
+	loadouts: LoadoutPayload[];
+	activeIndex: number;
+}
+
+/** Payload v1 historique : 1 seule page, champs au top-level (sans `name`/`v`). */
+export interface BuildPayloadV1 {
+	stats: CharacterStats;
+	armor: { head: string | null; chest: string | null; hands: string | null; legs: string | null };
+	talismans: (string | null)[];
+	weapons: {
+		right: string | null;
+		left: string | null;
+		rightSecondary?: (string | null)[];
+		leftSecondary?: (string | null)[];
+	};
+	ashes?: {
+		right: string | null;
+		left: string | null;
+		rightSecondary?: (string | null)[];
+		leftSecondary?: (string | null)[];
+	};
+	ammos?: { arrows?: (string | null)[]; bolts?: (string | null)[] };
+	spells: (string | null)[];
+	spirit: string | null;
+	guide: string;
+}
+
+export type BuildPayload = BuildPayloadV2 | BuildPayloadV1;
+
+function serializeLoadout(l: Loadout): LoadoutPayload {
 	return {
-		stats: state.stats,
+		name: l.name,
+		stats: l.stats,
 		armor: {
-			head: state.armor.head?.id ?? null,
-			chest: state.armor.chest?.id ?? null,
-			hands: state.armor.hands?.id ?? null,
-			legs: state.armor.legs?.id ?? null
+			head: l.armor.head?.id ?? null,
+			chest: l.armor.chest?.id ?? null,
+			hands: l.armor.hands?.id ?? null,
+			legs: l.armor.legs?.id ?? null
 		},
-		talismans: state.talismans.map((t) => t?.id ?? null),
+		talismans: l.talismans.map((t) => t?.id ?? null),
 		weapons: {
-			right: state.weapons.right?.id ?? null,
-			left: state.weapons.left?.id ?? null,
-			rightSecondary: state.weapons.rightSecondary?.map((w) => w?.id ?? null) ?? [null, null],
-			leftSecondary: state.weapons.leftSecondary?.map((w) => w?.id ?? null) ?? [null, null]
+			right: l.weapons.right?.id ?? null,
+			left: l.weapons.left?.id ?? null,
+			rightSecondary: l.weapons.rightSecondary?.map((w) => w?.id ?? null) ?? [null, null],
+			leftSecondary: l.weapons.leftSecondary?.map((w) => w?.id ?? null) ?? [null, null]
 		},
 		ashes: {
-			right: state.ashes?.right?.id ?? null,
-			left: state.ashes?.left?.id ?? null,
-			rightSecondary: state.ashes?.rightSecondary?.map((a) => a?.id ?? null) ?? [null, null],
-			leftSecondary: state.ashes?.leftSecondary?.map((a) => a?.id ?? null) ?? [null, null]
+			right: l.ashes?.right?.id ?? null,
+			left: l.ashes?.left?.id ?? null,
+			rightSecondary: l.ashes?.rightSecondary?.map((a) => a?.id ?? null) ?? [null, null],
+			leftSecondary: l.ashes?.leftSecondary?.map((a) => a?.id ?? null) ?? [null, null]
 		},
 		ammos: {
-			arrows: state.ammos?.arrows?.map((a) => a?.id ?? null) ?? [null, null],
-			bolts: state.ammos?.bolts?.map((a) => a?.id ?? null) ?? [null, null]
+			arrows: l.ammos?.arrows?.map((a) => a?.id ?? null) ?? [null, null],
+			bolts: l.ammos?.bolts?.map((a) => a?.id ?? null) ?? [null, null]
 		},
-		spells: state.spells.map((s) => s?.id ?? null),
-		spirit: state.spirit?.id ?? null,
-		guide: state.guide
+		spells: l.spells.map((s) => s?.id ?? null),
+		spirit: l.spirit?.id ?? null,
+		guide: l.guide
+	};
+}
+
+export function serializeBuild(state: BuildState): BuildPayloadV2 {
+	return {
+		v: 2,
+		loadouts: state.loadouts.map(serializeLoadout),
+		activeIndex: state.activeIndex
 	};
 }
 
@@ -92,7 +132,7 @@ function padTo2<T>(arr: (T | null)[] | undefined): (T | null)[] {
 	return [a[0] ?? null, a[1] ?? null];
 }
 
-export function deserializeBuild(payload: BuildPayload, lookups: DeserializeLookups): BuildState {
+function deserializeLoadout(payload: LoadoutPayload | BuildPayloadV1, lookups: DeserializeLookups, defaultName: string): Loadout {
 	const allSpells: Spell[] = [...lookups.sorceries, ...lookups.incantations];
 	const allLeftHand: Weapon[] = [...lookups.weapons, ...lookups.shields];
 	const ashesPool: AshOfWar[] = lookups.ashes_of_war ?? [];
@@ -104,6 +144,7 @@ export function deserializeBuild(payload: BuildPayload, lookups: DeserializeLook
 	const arrIds = padTo2<string>(payload.ammos?.arrows);
 	const boltIds = padTo2<string>(payload.ammos?.bolts);
 	return {
+		name: 'name' in payload && payload.name ? payload.name : defaultName,
 		stats: payload.stats,
 		armor: {
 			head: findById(lookups.armors, payload.armor.head),
@@ -132,4 +173,19 @@ export function deserializeBuild(payload: BuildPayload, lookups: DeserializeLook
 		spirit: findById(lookups.spirits, payload.spirit),
 		guide: payload.guide
 	};
+}
+
+function isV2(p: BuildPayload): p is BuildPayloadV2 {
+	return (p as BuildPayloadV2).v === 2 && Array.isArray((p as BuildPayloadV2).loadouts);
+}
+
+export function deserializeBuild(payload: BuildPayload, lookups: DeserializeLookups): BuildState {
+	if (isV2(payload)) {
+		const loadouts = payload.loadouts.map((p, i) => deserializeLoadout(p, lookups, `Page ${i + 1}`));
+		if (loadouts.length === 0) loadouts.push(deserializeLoadout({} as BuildPayloadV1, lookups, 'Main'));
+		const activeIndex = Math.max(0, Math.min(loadouts.length - 1, payload.activeIndex ?? 0));
+		return { loadouts, activeIndex };
+	}
+	// v1 : un seul loadout au top-level, on l'enveloppe.
+	return { loadouts: [deserializeLoadout(payload, lookups, 'Main')], activeIndex: 0 };
 }
