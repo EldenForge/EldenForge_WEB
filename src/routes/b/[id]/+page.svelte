@@ -32,11 +32,10 @@
 	const multiBuild = $derived(
 		build && lookups ? deserializeBuild(build.data as unknown as BuildPayload, lookups) : null
 	);
-	let viewIndex = $state<number | null>(null);
+	let viewIndex = $state(0);
 	const buildState = $derived.by(() => {
 		if (!multiBuild) return null;
-		const idx = viewIndex ?? multiBuild.activeIndex;
-		const safe = Math.max(0, Math.min(multiBuild.loadouts.length - 1, idx));
+		const safe = Math.max(0, Math.min(multiBuild.loadouts.length - 1, viewIndex));
 		return multiBuild.loadouts[safe] ?? null;
 	});
 
@@ -312,8 +311,7 @@
 			<section class="card !p-2 mb-4">
 				<div class="flex items-center gap-1 flex-wrap">
 					{#each multiBuild.loadouts as l, i (i)}
-						{@const idx = viewIndex ?? multiBuild.activeIndex}
-						{@const isActive = i === idx}
+						{@const isActive = i === viewIndex}
 						<button
 							type="button"
 							onclick={() => (viewIndex = i)}
