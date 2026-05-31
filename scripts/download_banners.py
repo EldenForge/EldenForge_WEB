@@ -34,14 +34,16 @@ SOURCES = ROOT / "static" / "art" / "sources.json"
 OUT_DIR = ROOT / "static" / "art" / "banners"
 TS_OUT = ROOT / "src" / "lib" / "art" / "banners.ts"
 
-# Types worth keeping as profile banners (skip logos / small capsules / zips).
-KEEP_TYPES = {"screenshot", "wallpaper", "hero", "background", "key_art", "promo_art"}
+# Types qu'on garde : screenshots de jeu + hero shots + promo art (Messmer collector).
+# On retire backgrounds (Steam pages), wallpapers, key_arts (= boxart-ish) trop statiques.
+KEEP_TYPES = {"screenshot", "hero", "promo_art"}
 
-# Skip Steam "hero_capsule" (small) and "library_hero" 2x duplicates if filename suggests it.
+# Skip explicites par pattern d'URL.
 SKIP_NAME_PATTERNS = [
     re.compile(r"hero_capsule", re.IGNORECASE),
     re.compile(r"library_hero_2x", re.IGNORECASE),
-    re.compile(r"page_bg_generated", re.IGNORECASE),  # background "raw" is cleaner
+    re.compile(r"page_bg_generated", re.IGNORECASE),
+    re.compile(r"apps/2778580/ss_", re.IGNORECASE),  # SOTE Steam screenshot : on garde uniquement les screenshots Bandai
 ]
 
 

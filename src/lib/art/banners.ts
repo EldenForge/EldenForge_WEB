@@ -100,14 +100,6 @@ export const BANNERS: Banner[] = [
 		type: "hero"
 	},
 	{
-		path: "/art/banners/elden-ring-background-raw.jpg",
-		name: "ELDEN RING Background Raw",
-		source: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/1245620/page_bg_raw.jpg?t=1767883716",
-		copyright: "ELDEN RING\u2122 & \u00a9BANDAI NAMCO Entertainment Inc. / \u00a92022 FromSoftware, Inc.",
-		game: "elden_ring",
-		type: "background"
-	},
-	{
 		path: "/art/banners/shadow-of-the-erdtree-screenshot-01.jpg",
 		name: "Shadow of the Erdtree Screenshot 01",
 		source: "https://static.bandainamcoent.eu/high/elden-ring/elden-ring/08-shadow-of-the-erdtree/elden-ring-expansion-SOTE/01-screenshot/ERSOTE-screenshot-1.png",
@@ -196,52 +188,12 @@ export const BANNERS: Banner[] = [
 		type: "screenshot"
 	},
 	{
-		path: "/art/banners/shadow-of-the-erdtree-wallpaper-png.jpg",
-		name: "Shadow of the Erdtree Wallpaper PNG",
-		source: "https://media-center.bandainamcoent.eu/games/elden-ring/elden-ring-shadow-of-the-erdtree-wallpaper-download.png",
-		copyright: "ELDEN RING Shadow of the Erdtree\u2122 & \u00a9BANDAI NAMCO Entertainment Inc. / \u00a92024 FromSoftware, Inc.",
-		game: "shadow_of_the_erdtree",
-		type: "wallpaper"
-	},
-	{
-		path: "/art/banners/shadow-of-the-erdtree-key-art.jpg",
-		name: "Shadow of the Erdtree Key Art",
-		source: "https://us-east-1-bandai.graphassets.com/AXzioIclSWilEjFtsMJPwz/oBmYzq2Sk6LaaTvDhLAw",
-		copyright: "ELDEN RING Shadow of the Erdtree\u2122 & \u00a9BANDAI NAMCO Entertainment Inc. / \u00a92024 FromSoftware, Inc.",
-		game: "shadow_of_the_erdtree",
-		type: "key_art"
-	},
-	{
-		path: "/art/banners/shadow-of-the-erdtree-key-art-red-variant.jpg",
-		name: "Shadow of the Erdtree Key Art Red Variant",
-		source: "https://us-east-1-bandai.graphassets.com/AXzioIclSWilEjFtsMJPwz/rmrBqkkeTHy2Aq6hcwom",
-		copyright: "ELDEN RING Shadow of the Erdtree\u2122 & \u00a9BANDAI NAMCO Entertainment Inc. / \u00a92024 FromSoftware, Inc.",
-		game: "shadow_of_the_erdtree",
-		type: "key_art"
-	},
-	{
 		path: "/art/banners/shadow-of-the-erdtree-collector-edition-messmer-promo.jpg",
 		name: "Shadow of the Erdtree Collector Edition Messmer Promo",
 		source: "https://us-east-1-bandai.graphassets.com/AXzioIclSWilEjFtsMJPwz/hlpdWmnJQ9eIJBSTCoCy",
 		copyright: "ELDEN RING Shadow of the Erdtree\u2122 & \u00a9BANDAI NAMCO Entertainment Inc. / \u00a92024 FromSoftware, Inc.",
 		game: "shadow_of_the_erdtree",
 		type: "promo_art"
-	},
-	{
-		path: "/art/banners/shadow-of-the-erdtree-background-raw.jpg",
-		name: "Shadow of the Erdtree Background Raw",
-		source: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2778580/page_bg_raw.jpg",
-		copyright: "ELDEN RING Shadow of the Erdtree\u2122 & \u00a9BANDAI NAMCO Entertainment Inc. / \u00a92024 FromSoftware, Inc.",
-		game: "shadow_of_the_erdtree",
-		type: "background"
-	},
-	{
-		path: "/art/banners/shadow-of-the-erdtree-steam-screenshot.jpg",
-		name: "Shadow of the Erdtree Steam Screenshot",
-		source: "https://shared.fastly.steamstatic.com/store_item_assets/steam/apps/2778580/ss_c97bcad291f4f45d4be4594f34bd78921d961099.jpg",
-		copyright: "ELDEN RING Shadow of the Erdtree\u2122 & \u00a9BANDAI NAMCO Entertainment Inc. / \u00a92024 FromSoftware, Inc.",
-		game: "shadow_of_the_erdtree",
-		type: "screenshot"
 	},
 ];
 
