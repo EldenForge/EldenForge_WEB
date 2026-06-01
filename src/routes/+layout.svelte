@@ -7,11 +7,16 @@
 	import AuthModal from '$lib/components/AuthModal.svelte';
 	import { authStore } from '$lib/stores/auth';
 	import { authModalOpen } from '$lib/stores/ui';
+	import { BANNERS } from '$lib/art/banners';
 
 	let { children } = $props();
+	let bgBanner = $state<string | null>(null);
 
 	onMount(() => {
 		authStore.bootstrap();
+		// Une image stable pour toute la session (pas par route, pour eviter le flicker)
+		const pick = BANNERS[Math.floor(Math.random() * BANNERS.length)];
+		bgBanner = pick?.path ?? null;
 	});
 
 	function openLogin() {
@@ -21,6 +26,23 @@
 		authModalOpen.set(false);
 	}
 </script>
+
+<!-- Vitrail decoratif : screenshot ER/SOTE flou + vignette sombre pour la lisibilite -->
+{#if bgBanner}
+	<div class="fixed inset-0 -z-10 pointer-events-none">
+		<img
+			src={bgBanner}
+			alt=""
+			aria-hidden="true"
+			class="w-full h-full object-cover"
+			style="filter: blur(3px);"
+		/>
+		<div
+			class="absolute inset-0"
+			style="background: radial-gradient(ellipse at center, rgb(0 0 0 / 0.45) 25%, rgb(20 18 14 / 0.92) 80%);"
+		></div>
+	</div>
+{/if}
 
 <nav class="sticky top-0 z-40 bg-dark-900/95 backdrop-blur border-b border-gold/15">
 	<div class="max-w-7xl mx-auto px-4 flex items-center gap-1 h-11">
