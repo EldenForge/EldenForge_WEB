@@ -1,10 +1,10 @@
 import { handleErrorWithSentry, init } from '@sentry/sveltekit';
-import { PUBLIC_SENTRY_DSN, PUBLIC_SENTRY_ENVIRONMENT } from '$env/static/public';
+import { env } from '$env/dynamic/public';
 
-if (PUBLIC_SENTRY_DSN) {
+if (env.PUBLIC_SENTRY_DSN) {
 	init({
-		dsn: PUBLIC_SENTRY_DSN,
-		environment: PUBLIC_SENTRY_ENVIRONMENT || 'dev',
+		dsn: env.PUBLIC_SENTRY_DSN,
+		environment: env.PUBLIC_SENTRY_ENVIRONMENT || 'dev',
 		tracesSampleRate: 0,
 		sendDefaultPii: false
 	});
