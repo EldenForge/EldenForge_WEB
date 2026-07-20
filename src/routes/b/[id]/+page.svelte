@@ -251,11 +251,10 @@
 			</p>
 			{#if build.forked_from}
 				<p class="text-parchment/30 text-xs mt-1 italic">
-					Forked from
+					Version originale de ce build :
 					<a href="/b/{build.forked_from.id}" class="text-gold/60 hover:text-gold underline">
 						{build.forked_from.name}
-					</a>
-					by
+					</a>, par
 					<a href="/u/{encodeURIComponent(build.forked_from.author_pseudo)}" class="text-gold/60 hover:text-gold underline">
 						{build.forked_from.author_pseudo}
 					</a>

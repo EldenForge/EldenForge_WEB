@@ -41,12 +41,18 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if open}
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center p-4"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="item-picker-title"
+	>
 		<!-- Overlay -->
 		<div
 			class="absolute inset-0 bg-black/70 backdrop-blur-sm"
 			role="button"
 			tabindex="-1"
+			aria-label="Fermer la fenêtre en cliquant en dehors"
 			onclick={onclose}
 			onkeydown={(e) => e.key === 'Enter' && onclose()}
 		></div>
@@ -58,7 +64,7 @@
 		>
 			<!-- Header -->
 			<div class="flex items-center justify-between px-5 py-4 border-b border-dark-400">
-				<h3 class="font-cinzel text-gold tracking-wider text-lg">{title}</h3>
+				<h3 id="item-picker-title" class="font-cinzel text-gold tracking-wider text-lg">{title}</h3>
 				<button
 					type="button"
 					onclick={onclose}

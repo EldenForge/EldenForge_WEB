@@ -29,6 +29,9 @@
 <button
 	class="flex flex-col items-center gap-1 group cursor-pointer"
 	type="button"
+	aria-label={equipped
+		? `${slotLabel}, actuellement ${itemName}. Cliquer pour modifier.`
+		: `${slotLabel}, vide. Cliquer pour équiper un item.`}
 	{onclick}
 	onmouseenter={(e) => { if (itemData) tooltipStore.show(itemData, e.clientX, e.clientY); }}
 	onmousemove={(e) => { if (itemData) tooltipStore.move(e.clientX, e.clientY); }}

@@ -27,6 +27,16 @@
 	}
 </script>
 
+<!-- Skip link : visible uniquement au focus clavier (WCAG 2.4.1) -->
+<a
+	href="#main"
+	class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50
+		focus:px-4 focus:py-2 focus:bg-gold focus:text-dark-900 focus:rounded
+		focus:font-cinzel focus:tracking-wider focus:shadow-lg"
+>
+	Aller au contenu principal
+</a>
+
 <!-- Vitrail decoratif : screenshot ER/SOTE flou + vignette sombre pour la lisibilite -->
 {#if bgBanner}
 	<div class="fixed inset-0 -z-10 pointer-events-none">
@@ -100,7 +110,9 @@
 	</div>
 </nav>
 
-{@render children()}
+<main id="main">
+	{@render children()}
+</main>
 
 <footer class="mt-16 border-t border-gold/10 bg-dark-900/40">
 	<div class="max-w-7xl mx-auto px-4 py-4 text-[10px] text-parchment/40 font-cinzel tracking-wider text-center leading-relaxed">

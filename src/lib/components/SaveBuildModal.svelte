@@ -109,11 +109,17 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if open}
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center p-4"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="save-build-modal-title"
+	>
 		<div
 			class="absolute inset-0 bg-black/70 backdrop-blur-sm"
 			role="button"
 			tabindex="-1"
+			aria-label="Fermer la fenêtre en cliquant en dehors"
 			onclick={onclose}
 			onkeydown={(e) => e.key === 'Enter' && onclose()}
 		></div>
@@ -123,7 +129,7 @@
 				shadow-2xl shadow-black/50"
 		>
 			<div class="px-5 py-4 border-b border-dark-400">
-				<h3 class="font-cinzel text-gold tracking-wider text-lg">
+				<h3 id="save-build-modal-title" class="font-cinzel text-gold tracking-wider text-lg">
 					{existingBuildId ? 'Update Build' : 'Save Build'}
 				</h3>
 			</div>
@@ -199,7 +205,7 @@
 				</div>
 
 				{#if error}
-					<p class="text-red-400 text-xs">{error}</p>
+					<p class="text-red-400 text-xs" role="alert" aria-live="assertive">{error}</p>
 				{/if}
 
 				<div class="flex gap-2 pt-2">

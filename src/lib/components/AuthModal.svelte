@@ -102,11 +102,17 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if open}
-	<div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center p-4"
+		role="dialog"
+		aria-modal="true"
+		aria-labelledby="auth-modal-title"
+	>
 		<div
 			class="absolute inset-0 bg-black/70 backdrop-blur-sm"
 			role="button"
 			tabindex="-1"
+			aria-label="Fermer la fenêtre en cliquant en dehors"
 			onclick={onclose}
 			onkeydown={(e) => e.key === 'Enter' && onclose()}
 		></div>
@@ -115,6 +121,7 @@
 			class="relative bg-dark-700 border border-gold/30 rounded-xl w-full max-w-sm
 				shadow-2xl shadow-black/50"
 		>
+		<h2 id="auth-modal-title" class="sr-only">Fenêtre d'authentification</h2>
 			{#if mode !== 'forgot'}
 				<div class="flex border-b border-dark-400">
 					<button
@@ -197,11 +204,11 @@
 				{/if}
 
 				{#if error}
-					<p class="text-red-400 text-xs">{error}</p>
+					<p class="text-red-400 text-xs" role="alert" aria-live="assertive">{error}</p>
 				{/if}
 
 				{#if infoMessage}
-					<p class="text-gold/70 text-xs italic">{infoMessage}</p>
+					<p class="text-gold/70 text-xs italic" role="status" aria-live="polite">{infoMessage}</p>
 				{/if}
 
 				<div class="flex gap-2 pt-2">

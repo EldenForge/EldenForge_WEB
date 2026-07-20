@@ -95,7 +95,8 @@
 		{#if build.has_dlc}
 			<span
 				title="Uses Shadow of the Erdtree content"
-				class="text-[9px] font-cinzel tracking-widest uppercase px-1.5 py-0.5 rounded border border-purple-400/40 bg-purple-500/15 text-purple-200/90"
+				aria-label="Contient du contenu Shadow of the Erdtree"
+				class="text-[9px] font-cinzel tracking-widest uppercase px-1.5 py-0.5 rounded border border-purple-300/60 bg-purple-500/25 text-purple-100"
 			>SOTE</span>
 		{/if}
 		<IntentBadge intent={build.intent ?? 'pve'} />

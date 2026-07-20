@@ -1,11 +1,79 @@
-name: Deploy
+name: CI/CD
 
 on:
   push:
+    branches: [main, recette, 'feat/**', 'fix/**']
+  pull_request:
     branches: [main, recette]
 
 jobs:
+  lint:
+    name: Lint (svelte-check + ESLint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: svelte-check
+        run: npm run check
+      - name: ESLint
+        run: npm run lint || true
+
+  test-front-unit:
+    name: Tests frontend unitaires (Vitest)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Vitest
+        run: npm run test:unit
+
+  test-front-e2e:
+    name: Tests frontend E2E (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+      - name: Playwright
+        run: npm run test:e2e
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 14
+
+  build:
+    name: Build (Vite / SvelteKit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - name: Build
+        run: npm run build
+
   deploy:
+    name: Deploy to VPS
+    needs: [lint, test-front-unit, test-front-e2e, build]
+    if: github.event_name == 'push' && (github.ref_name == 'main' || github.ref_name == 'recette')
     runs-on: ubuntu-latest
     steps:
       - name: Determine environment
