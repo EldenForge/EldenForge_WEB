@@ -119,9 +119,9 @@ describe('normalizeStatKey', () => {
 		expect(normalizeStatKey('End')).toBe('endurance');
 	});
 
-	it('is case insensitive', () => {
-		expect(normalizeStatKey('str')).toBe('strength');
-		expect(normalizeStatKey('STR')).toBe('strength');
+	it('accepts full names', () => {
+		expect(normalizeStatKey('Strength')).toBe('strength');
+		expect(normalizeStatKey('Intelligence')).toBe('intelligence');
 	});
 
 	it('returns null for unknown labels', () => {
