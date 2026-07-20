@@ -49,12 +49,12 @@
 	<div class="flex flex-wrap gap-3 mb-5 items-center">
 		<input
 			type="text"
-			placeholder="Search..." aria-label="Rechercher dans les items"
+			placeholder="Search..." aria-label="Search items"
 			bind:value={search}
 			class="flex-1 min-w-[12rem] bg-dark-800 border border-dark-400 rounded px-3 py-1.5 text-sm text-parchment placeholder:text-parchment/30 focus:outline-none focus:border-gold/50"
 		/>
 		<select
-			bind:value={category} aria-label="Filtrer par categorie de bouclier"
+			bind:value={category} aria-label="Filter by shield category"
 			style="appearance:none; -webkit-appearance:none; -moz-appearance:none; background-image:none;"
 			class="bg-dark-800 border border-dark-400 rounded text-sm text-parchment/80 pl-3 pr-7 py-1.5 font-cinzel cursor-pointer focus:outline-none focus:border-gold/50"
 		>

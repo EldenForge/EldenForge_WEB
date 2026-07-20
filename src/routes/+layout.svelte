@@ -34,7 +34,7 @@
 		focus:px-4 focus:py-2 focus:bg-gold focus:text-dark-900 focus:rounded
 		focus:font-cinzel focus:tracking-wider focus:shadow-lg"
 >
-	Aller au contenu principal
+	Skip to main content
 </a>
 
 <!-- Vitrail decoratif : screenshot ER/SOTE flou + vignette sombre pour la lisibilite -->

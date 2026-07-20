@@ -5,13 +5,13 @@ test.describe('Accessibility landmarks', () => {
 		await page.goto('/');
 		// Tab focuses the skip link (usually the first focusable element)
 		await page.keyboard.press('Tab');
-		const skip = page.getByRole('link', { name: /aller au contenu principal/i });
+		const skip = page.getByRole('link', { name: /skip to main content/i });
 		await expect(skip).toBeFocused();
 	});
 
 	test('skip link targets an element with id="main"', async ({ page }) => {
 		await page.goto('/');
-		const skip = page.getByRole('link', { name: /aller au contenu principal/i });
+		const skip = page.getByRole('link', { name: /skip to main content/i });
 		await expect(skip).toHaveAttribute('href', '#main');
 		await expect(page.locator('#main')).toBeVisible();
 	});

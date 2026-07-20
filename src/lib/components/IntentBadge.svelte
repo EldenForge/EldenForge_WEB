@@ -12,17 +12,17 @@
 		pve: {
 			label: 'PvE',
 			cls: 'text-emerald-100 border-emerald-300/70 bg-emerald-500/25',
-			aria: 'Mode PvE, joueur contre environnement'
+			aria: 'PvE mode, player versus environment'
 		},
 		coop: {
 			label: 'Co-op',
 			cls: 'text-sky-100 border-sky-300/70 bg-sky-500/25',
-			aria: 'Mode coopératif'
+			aria: 'Cooperative mode'
 		},
 		pvp: {
 			label: 'PvP',
 			cls: 'text-rose-100 border-rose-300/70 bg-rose-500/25',
-			aria: 'Mode PvP, joueur contre joueur'
+			aria: 'PvP mode, player versus player'
 		}
 	};
 

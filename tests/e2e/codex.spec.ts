@@ -15,13 +15,13 @@ test.describe('Codex navigation', () => {
 
 	test('search input on codex/weapons has an accessible name', async ({ page }) => {
 		await page.goto('/codex/weapons');
-		const search = page.getByLabel(/rechercher/i);
+		const search = page.getByLabel(/search items/i);
 		await expect(search).toBeVisible();
 	});
 
 	test('category filter on codex/weapons has an accessible name', async ({ page }) => {
 		await page.goto('/codex/weapons');
-		const select = page.getByLabel(/filtrer par categorie/i);
+		const select = page.getByLabel(/filter by weapon category/i);
 		await expect(select).toBeVisible();
 	});
 });

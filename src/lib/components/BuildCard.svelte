@@ -95,7 +95,7 @@
 		{#if build.has_dlc}
 			<span
 				title="Uses Shadow of the Erdtree content"
-				aria-label="Contient du contenu Shadow of the Erdtree"
+				aria-label="Contains Shadow of the Erdtree content"
 				class="text-[9px] font-cinzel tracking-widest uppercase px-1.5 py-0.5 rounded border border-purple-300/60 bg-purple-500/25 text-purple-100"
 			>SOTE</span>
 		{/if}

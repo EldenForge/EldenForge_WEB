@@ -42,7 +42,7 @@
 	<div class="flex flex-wrap gap-3 mb-5 items-center">
 		<input
 			type="text"
-			placeholder="Search..." aria-label="Rechercher dans les items"
+			placeholder="Search..." aria-label="Search items"
 			bind:value={search}
 			class="flex-1 min-w-[12rem] bg-dark-800 border border-dark-400 rounded px-3 py-1.5 text-sm text-parchment placeholder:text-parchment/30 focus:outline-none focus:border-gold/50"
 		/>

@@ -112,7 +112,7 @@
 			class="absolute inset-0 bg-black/70 backdrop-blur-sm"
 			role="button"
 			tabindex="-1"
-			aria-label="Fermer la fenêtre en cliquant en dehors"
+			aria-label="Click outside to close"
 			onclick={onclose}
 			onkeydown={(e) => e.key === 'Enter' && onclose()}
 		></div>
@@ -121,7 +121,7 @@
 			class="relative bg-dark-700 border border-gold/30 rounded-xl w-full max-w-sm
 				shadow-2xl shadow-black/50"
 		>
-		<h2 id="auth-modal-title" class="sr-only">Fenêtre d'authentification</h2>
+		<h2 id="auth-modal-title" class="sr-only">Sign in dialog</h2>
 			{#if mode !== 'forgot'}
 				<div class="flex border-b border-dark-400">
 					<button
