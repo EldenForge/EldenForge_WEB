@@ -21,7 +21,7 @@
     "@testing-library/svelte": "^5.2.0",
     "@vitest/coverage-v8": "^2.1.0",
     "autoprefixer": "^10.4.0",
-    "jsdom": "^25.0.0",
+    "jsdom": "^30.0.1",
     "postcss": "^8.4.0",
     "svelte": "^5.0.0",
     "svelte-check": "^4.0.0",
