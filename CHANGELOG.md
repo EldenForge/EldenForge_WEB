@@ -10,6 +10,51 @@ majeure.mineure.patch.
 
 ---
 
+## v1.1.0 - 2026-07-20 - Délivrabilité des emails
+
+### Ajouté
+- Domaine d'envoi Resend authentifié `mail.eldenforge.fr` avec
+  enregistrements DNS SPF, DKIM et DMARC publiés.
+- Mention explicite sur la page d'inscription invitant à vérifier
+  le dossier spam en cas de non-réception dans les cinq minutes.
+
+### Corrigé
+- Livraison des emails de vérification en dossier spam sur
+  Outlook et Hotmail (retour utilisateurs sur Discord
+  `#eldenforge-support`).
+
+---
+
+## v1.0.3 - 2026-07-12 - Correctif Save mobile
+
+### Corrigé
+- **WEB #47** : le bouton `Save build` ne réagissait pas sur
+  Android Chrome (composant `SaveBuildModal`, ajout de
+  `touch-action: manipulation` et retrait du `pointer-events`
+  interceptant les touches).
+
+---
+
+## v1.0.2 - 2026-07-08 - Correctif Explore Trending
+
+### Corrigé
+- **WEB #46** : lenteur de la page Explore avec les builds
+  cumulant plus de cinquante likes. Ajout d'un index composé sur
+  `build_likes (build_id, created_at)` via migration Alembic
+  `a3f2`. Latence p95 sur `/public/builds/trending` passée de
+  ~1 800 ms à ~92 ms.
+- Scénario de non-régression `R-46-01` ajouté au cahier de
+  recettes (vérification du plan `EXPLAIN` sur la requête).
+
+---
+
+## v1.0.1 - 2026-06-30 - Correctif rendu PDF
+
+### Corrigé
+- Rendu PDF des tableaux de recette sur la page d'export.
+
+---
+
 ## v1.0.0 - 2026-06-27 - Monitoring et alerting
 
 ### Ajouté
@@ -24,10 +69,6 @@ majeure.mineure.patch.
   associer une erreur à une version précise.
 - Alertes email sur chaque nouvelle issue non regroupée, plus un webhook
   Discord vers le canal `#eldenforge-alerts`.
-
-### Correctifs
-- v1.0.1 : rendu PDF des tableaux de recette corrigé sur la page
-  d'export.
 
 ---
 
