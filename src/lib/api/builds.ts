@@ -125,6 +125,13 @@ export async function getPublicBuild(id: string): Promise<PublicBuildOut> {
 	return get<PublicBuildOut>(`/public/builds/${id}`);
 }
 
+export async function listMyLikes(limit = 60, offset = 0): Promise<PublicBuildListItem[]> {
+	const q = new URLSearchParams();
+	q.set('limit', String(limit));
+	q.set('offset', String(offset));
+	return get<PublicBuildListItem[]>(`/users/me/likes?${q.toString()}`);
+}
+
 export async function forkBuild(id: string): Promise<BuildOut> {
 	return post<BuildOut>(`/builds/${id}/fork`);
 }
