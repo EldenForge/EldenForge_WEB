@@ -94,26 +94,6 @@
 		>
 			Codex
 		</a>
-		{#if $authStore.user}
-			<a
-				href="/builds"
-				class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
-					{$page.url.pathname === '/builds'
-					? 'text-gold bg-gold/10 border border-gold/30'
-					: 'text-parchment/50 hover:text-parchment/80'}"
-			>
-				My Builds
-			</a>
-			<a
-				href="/liked"
-				class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
-					{$page.url.pathname === '/liked'
-					? 'text-gold bg-gold/10 border border-gold/30'
-					: 'text-parchment/50 hover:text-parchment/80'}"
-			>
-				Liked
-			</a>
-		{/if}
 		<div class="flex-1"></div>
 		<UserMenu onlogin={openLogin} />
 	</div>
