@@ -77,7 +77,7 @@
 	// ── Liked tab ──
 	const LIKED_PAGE_SIZE = 30;
 	let liked = $state<PublicBuildListItem[]>([]);
-	let likedLoading = $state(false);
+	let likedLoading = $state(true);
 	let likedLoadingMore = $state(false);
 	let likedError = $state<string | null>(null);
 	let likedHasMore = $state(false);
@@ -104,12 +104,14 @@
 		}
 	}
 
-	// Lazy-load per tab on first visit.
+	// Lazy-load per tab on first visit. The `loaded` flag alone is the guard;
+	// the `loading` flag stays true until the fetch completes so the UI shows
+	// a spinner rather than the empty state during the initial fetch.
 	$effect(() => {
 		if (!$authStore.user) return;
-		if (activeTab === 'builds' && !myBuildsLoaded && !myBuildsLoading) {
+		if (activeTab === 'builds' && !myBuildsLoaded) {
 			refreshMyBuilds();
-		} else if (activeTab === 'liked' && !likedLoaded && !likedLoading) {
+		} else if (activeTab === 'liked' && !likedLoaded) {
 			loadLiked(true);
 		}
 	});
