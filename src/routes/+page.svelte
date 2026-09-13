@@ -210,27 +210,28 @@
 		<!-- Tags groupés par catégorie -->
 		<TagFilter selected={selectedTags} onchange={onTagsChange} />
 
-		<!-- Sort + Reset -->
-		<div class="flex items-center justify-end gap-2">
+		<!-- Reset (left) + Sort (right) -->
+		<div class="flex items-center justify-between gap-2 flex-wrap">
+			<button
+				type="button"
+				onclick={resetFilters}
+				class="text-xs font-cinzel px-3 py-1.5 rounded border transition-colors cursor-pointer
+					border-crimson/40 text-crimson-light/80 hover:text-crimson-light hover:border-crimson/70 hover:bg-crimson/10"
+			>
+				↻ Reset filters
+			</button>
 			<div class="flex gap-1">
-				{#each [{ id: 'recent', label: 'Recent' }, { id: 'trending', label: 'Trending' }, { id: 'popular', label: 'Popular' }] as opt}
+				{#each [{ id: 'recent', label: 'Recent' }, { id: 'trending', label: 'Trending' }] as opt}
 					<button
 						type="button"
 						onclick={() => setSort(opt.id as 'recent' | 'popular' | 'trending')}
 						class="text-xs font-cinzel px-3 py-1.5 rounded border transition-colors cursor-pointer
-							{sort === opt.id ? 'text-gold bg-gold/15 border-gold/50' : 'text-parchment/50 border-dark-400 hover:border-gold/30'}"
+							{sort === opt.id ? 'text-gold bg-gold/15 border-gold/50' : 'text-parchment/60 border-dark-400 hover:text-parchment hover:border-gold/30'}"
 					>
 						{opt.label}
 					</button>
 				{/each}
 			</div>
-			<button
-				type="button"
-				onclick={resetFilters}
-				class="text-xs font-cinzel px-3 py-1.5 rounded border border-dark-400 text-parchment/40 hover:text-parchment/70 hover:border-parchment/30"
-			>
-				Reset
-			</button>
 		</div>
 	</div>
 

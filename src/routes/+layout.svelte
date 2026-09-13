@@ -60,37 +60,37 @@
 		<div class="h-4 w-px bg-gold/20 mr-3"></div>
 		<a
 			href="/"
-			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
+			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded border transition-colors
 				{$page.url.pathname === '/'
-				? 'text-gold bg-gold/10 border border-gold/30'
-				: 'text-parchment/50 hover:text-parchment/80'}"
+				? 'text-gold bg-gold/15 border-gold/50'
+				: 'text-parchment/75 border-transparent hover:text-parchment hover:bg-dark-800/60'}"
 		>
 			Explore
 		</a>
 		<a
 			href="/build"
-			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
+			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded border transition-colors
 				{$page.url.pathname === '/build'
-				? 'text-gold bg-gold/10 border border-gold/30'
-				: 'text-parchment/50 hover:text-parchment/80'}"
+				? 'text-gold bg-gold/15 border-gold/50'
+				: 'text-parchment/75 border-transparent hover:text-parchment hover:bg-dark-800/60'}"
 		>
 			Build
 		</a>
 		<a
 			href="/map"
-			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
+			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded border transition-colors
 				{$page.url.pathname === '/map'
-				? 'text-gold bg-gold/10 border border-gold/30'
-				: 'text-parchment/50 hover:text-parchment/80'}"
+				? 'text-gold bg-gold/15 border-gold/50'
+				: 'text-parchment/75 border-transparent hover:text-parchment hover:bg-dark-800/60'}"
 		>
 			Map
 		</a>
 		<a
 			href="/codex"
-			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded transition-colors
+			class="px-3 py-1 font-cinzel text-xs tracking-wider rounded border transition-colors
 				{$page.url.pathname.startsWith('/codex')
-				? 'text-gold bg-gold/10 border border-gold/30'
-				: 'text-parchment/50 hover:text-parchment/80'}"
+				? 'text-gold bg-gold/15 border-gold/50'
+				: 'text-parchment/75 border-transparent hover:text-parchment hover:bg-dark-800/60'}"
 		>
 			Codex
 		</a>
