@@ -4,12 +4,14 @@
 	import type { Weapon } from '$lib/types';
 	import CodexHeader from '$lib/components/CodexHeader.svelte';
 	import CodexCard from '$lib/components/CodexCard.svelte';
+	import WeaponDetailModal from '$lib/components/WeaponDetailModal.svelte';
 
 	let items = $state<Weapon[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let search = $state('');
 	let category = $state('');
+	let selectedWeapon = $state<Weapon | null>(null);
 
 	onMount(async () => {
 		try {
@@ -80,8 +82,11 @@
 					badges={scalingBadges(w)}
 					description={w.description}
 					findBuildsHref={`/?item=${encodeURIComponent(w.id)}`}
+					onclick={() => (selectedWeapon = w)}
 				/>
 			{/each}
 		</div>
 	{/if}
 </div>
+
+<WeaponDetailModal weapon={selectedWeapon} onclose={() => (selectedWeapon = null)} />
