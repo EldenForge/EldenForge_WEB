@@ -11,7 +11,7 @@
 	<a
 		href="/profile"
 		class="flex items-center gap-2 px-3 py-1 rounded font-cinzel text-xs tracking-wider
-			text-gold bg-gold/10 border border-gold/30 hover:bg-gold/20 cursor-pointer transition-colors"
+			text-gold bg-dark-900/85 border border-gold/50 hover:bg-dark-800 hover:border-gold cursor-pointer transition-colors"
 		title="Open profile"
 	>
 		<span class="truncate max-w-32">{$authStore.user.pseudo}</span>
@@ -21,7 +21,7 @@
 		type="button"
 		onclick={onlogin}
 		class="px-3 py-1 rounded font-cinzel text-xs tracking-wider text-gold
-			bg-gold/10 border border-gold/30 hover:bg-gold/20 cursor-pointer transition-colors"
+			bg-dark-900/85 border border-gold/50 hover:bg-dark-800 hover:border-gold cursor-pointer transition-colors"
 	>
 		Login
 	</button>
