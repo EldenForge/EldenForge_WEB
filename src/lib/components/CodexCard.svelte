@@ -6,42 +6,88 @@
 		badges?: string[];
 		description?: string;
 		findBuildsHref?: string;
+		onclick?: () => void;
 	}
-	let { image, name, subtitle, badges = [], description, findBuildsHref }: Props = $props();
+	let { image, name, subtitle, badges = [], description, findBuildsHref, onclick }: Props = $props();
+
+	const wrapperClass = onclick
+		? 'card flex gap-3 relative pb-7 cursor-pointer w-full text-left transition-all duration-200 hover:border-gold/60 hover:shadow-lg hover:shadow-gold/10 hover:-translate-y-0.5 hover:scale-[1.015]'
+		: `card flex gap-3 relative ${findBuildsHref ? 'pb-7' : ''}`;
+
+	function handleFindBuildsClick(e: MouseEvent) {
+		e.stopPropagation();
+	}
 </script>
 
-<div class="card flex gap-3 relative {findBuildsHref ? 'pb-7' : ''}">
-	{#if image}
-		<img
-			src={image}
-			alt={name}
-			class="w-14 h-14 object-contain bg-dark-800 rounded shrink-0"
-			loading="lazy"
-			onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
-		/>
-	{/if}
-	<div class="min-w-0 flex-1">
-		<div class="flex items-start justify-between gap-2">
-			<h3 class="font-cinzel text-gold text-sm truncate">{name}</h3>
-			{#if badges.length}
-				<div class="flex flex-wrap gap-1 shrink-0 justify-end">
-					{#each badges as b}
-						<span class="text-[10px] text-gold/70 border border-gold/25 rounded px-1.5 py-0.5">{b}</span>
-					{/each}
-				</div>
+{#if onclick}
+	<button type="button" {onclick} class={wrapperClass}>
+		{#if image}
+			<img
+				src={image}
+				alt={name}
+				class="w-14 h-14 object-contain bg-dark-800 rounded shrink-0"
+				loading="lazy"
+				onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+			/>
+		{/if}
+		<div class="min-w-0 flex-1">
+			<div class="flex items-start justify-between gap-2">
+				<h3 class="font-cinzel text-gold text-sm truncate">{name}</h3>
+				{#if badges.length}
+					<div class="flex flex-wrap gap-1 shrink-0 justify-end">
+						{#each badges as b}
+							<span class="text-[10px] text-gold/70 border border-gold/25 rounded px-1.5 py-0.5">{b}</span>
+						{/each}
+					</div>
+				{/if}
+			</div>
+			{#if subtitle}
+				<p class="text-parchment/70 text-xs mt-0.5">{subtitle}</p>
+			{/if}
+			{#if description}
+				<p class="text-parchment/50 text-[11px] mt-1 line-clamp-3">{description}</p>
 			{/if}
 		</div>
-		{#if subtitle}
-			<p class="text-parchment/70 text-xs mt-0.5">{subtitle}</p>
+		{#if findBuildsHref}
+			<span
+				class="absolute bottom-1.5 right-2 text-[10px] font-cinzel tracking-wider text-gold/40"
+			>Details &rarr;</span>
 		{/if}
-		{#if description}
-			<p class="text-parchment/50 text-[11px] mt-1 line-clamp-3">{description}</p>
+	</button>
+{:else}
+	<div class={wrapperClass}>
+		{#if image}
+			<img
+				src={image}
+				alt={name}
+				class="w-14 h-14 object-contain bg-dark-800 rounded shrink-0"
+				loading="lazy"
+				onerror={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')}
+			/>
+		{/if}
+		<div class="min-w-0 flex-1">
+			<div class="flex items-start justify-between gap-2">
+				<h3 class="font-cinzel text-gold text-sm truncate">{name}</h3>
+				{#if badges.length}
+					<div class="flex flex-wrap gap-1 shrink-0 justify-end">
+						{#each badges as b}
+							<span class="text-[10px] text-gold/70 border border-gold/25 rounded px-1.5 py-0.5">{b}</span>
+						{/each}
+					</div>
+				{/if}
+			</div>
+			{#if subtitle}
+				<p class="text-parchment/70 text-xs mt-0.5">{subtitle}</p>
+			{/if}
+			{#if description}
+				<p class="text-parchment/50 text-[11px] mt-1 line-clamp-3">{description}</p>
+			{/if}
+		</div>
+		{#if findBuildsHref}
+			<a
+				href={findBuildsHref}
+				class="absolute bottom-1.5 right-2 text-[10px] font-cinzel tracking-wider text-gold/40 hover:text-gold transition-colors"
+			>See builds &rarr;</a>
 		{/if}
 	</div>
-	{#if findBuildsHref}
-		<a
-			href={findBuildsHref}
-			class="absolute bottom-1.5 right-2 text-[10px] font-cinzel tracking-wider text-gold/40 hover:text-gold transition-colors"
-		>See builds &rarr;</a>
-	{/if}
-</div>
+{/if}

@@ -40,7 +40,7 @@
 	}
 </script>
 
-<a href="/b/{build.id}" class="card block hover:border-gold/40 transition-colors relative pb-7 overflow-hidden">
+<a href="/b/{build.id}" class="card block hover:border-gold/60 hover:shadow-lg hover:shadow-gold/10 hover:-translate-y-0.5 hover:scale-[1.015] transition-all duration-200 relative pb-7 overflow-hidden">
 	{#if build.primary_weapon_image}
 		<div
 			class="absolute inset-y-0 right-0 w-36 pointer-events-none flex items-center justify-center"
@@ -55,21 +55,20 @@
 			/>
 		</div>
 	{/if}
-	<div class="relative {build.primary_weapon_image ? 'pr-16' : ''}">
-	<div class="flex items-start justify-between gap-2">
-		<h3 class="font-cinzel text-gold text-base truncate">{build.name}</h3>
-		<button
-			type="button"
-			onclick={toggleLike}
-			disabled={pending}
-			aria-label={liked ? 'Unlike' : 'Like'}
-			class="flex items-center gap-1 text-xs shrink-0 transition-colors disabled:opacity-50
-				{liked ? 'text-red-400' : 'text-parchment/50 hover:text-red-400/70'}"
-		>
-			<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"/></svg>
-			{count}
-		</button>
-	</div>
+	<button
+		type="button"
+		onclick={toggleLike}
+		disabled={pending}
+		aria-label={liked ? 'Unlike' : 'Like'}
+		class="absolute top-2 right-2 z-10 flex items-center gap-1 text-xs shrink-0 transition-colors disabled:opacity-50
+			bg-dark-900/70 backdrop-blur px-2 py-1 rounded border border-dark-400/50
+			{liked ? 'text-red-400 border-red-400/40' : 'text-parchment/70 hover:text-red-400/80'}"
+	>
+		<svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.18L12 21z"/></svg>
+		{count}
+	</button>
+	<div class="relative {build.primary_weapon_image ? 'pr-16' : ''} pr-14">
+	<h3 class="font-cinzel text-gold text-base truncate">{build.name}</h3>
 	<p class="text-parchment/40 text-xs mt-1">
 		by
 		<button
