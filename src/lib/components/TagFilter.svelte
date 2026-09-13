@@ -18,7 +18,7 @@
 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-3">
 	{#each TAG_GROUPS as group}
 		<div>
-			<p class="text-[10px] font-cinzel uppercase tracking-[0.2em] text-gold/50 mb-1.5 border-b border-gold/15 pb-1">
+			<p class="text-[10px] font-cinzel uppercase tracking-[0.2em] text-gold/70 mb-1.5 border-b border-gold/25 pb-1">
 				{group.label}
 			</p>
 			<div class="flex flex-wrap gap-1.5">
@@ -28,8 +28,8 @@
 						onclick={() => toggle(tag)}
 						class="text-xs font-cinzel rounded px-2 py-1 border transition-colors cursor-pointer
 							{selected.includes(tag)
-							? 'text-gold bg-gold/15 border-gold/50'
-							: 'text-parchment/50 border-dark-400 hover:border-gold/30'}"
+							? 'text-gold bg-gold/20 border-gold/60'
+							: 'text-parchment/80 bg-dark-800/60 border-dark-300 hover:border-gold/50 hover:bg-dark-700/80'}"
 					>
 						{tag}
 					</button>
