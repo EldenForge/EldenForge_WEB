@@ -21,6 +21,37 @@ export class ApiError extends Error {
 	}
 }
 
+/**
+ * Extrait un message d'erreur lisible depuis un payload FastAPI. `detail`
+ * peut être une string (HTTPException) OU un tableau d'objets {loc, msg, type}
+ * (validation Pydantic 422). Sans ça on affichait "[object Object]".
+ */
+function extractDetail(data: unknown): string | null {
+	if (!data || typeof data !== 'object') return null;
+	const detail = (data as { detail?: unknown }).detail;
+	if (typeof detail === 'string') return detail;
+	if (Array.isArray(detail)) {
+		const parts = detail
+			.map((d) => {
+				if (!d || typeof d !== 'object') return String(d);
+				const obj = d as { msg?: unknown; loc?: unknown };
+				const msg = typeof obj.msg === 'string' ? obj.msg : '';
+				const loc = Array.isArray(obj.loc) ? obj.loc.filter((x) => x !== 'body').join('.') : '';
+				return loc ? `${loc}: ${msg}` : msg;
+			})
+			.filter(Boolean);
+		if (parts.length) return parts.join(' — ');
+	}
+	if (detail && typeof detail === 'object') {
+		try {
+			return JSON.stringify(detail);
+		} catch {
+			return null;
+		}
+	}
+	return null;
+}
+
 /** Paths for which we must NOT attempt silent refresh (would create infinite loops). */
 function isAuthFlowPath(path: string): boolean {
 	return (
@@ -88,10 +119,7 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 	}
 	const data = await res.json().catch(() => null);
 	if (!res.ok) {
-		const detail =
-			data && typeof data === 'object' && 'detail' in data
-				? String((data as { detail: unknown }).detail)
-				: res.statusText;
+		const detail = extractDetail(data) ?? res.statusText;
 		throw new ApiError(res.status, detail);
 	}
 	if (Array.isArray(data)) {
