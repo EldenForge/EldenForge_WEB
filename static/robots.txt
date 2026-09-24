@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /profile
+Disallow: /reset
+Disallow: /verify
+Disallow: /build?
+Disallow: /api/
+
+Sitemap: https://eldenforge.fr/sitemap.xml

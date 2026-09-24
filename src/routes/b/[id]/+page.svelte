@@ -221,7 +221,40 @@
 	});
 </script>
 
-<svelte:head><title>{build ? `${build.name} — Elden Forge` : 'Build — Elden Forge'}</title></svelte:head>
+<svelte:head>
+	<title>{build ? `${build.name} — Elden Forge` : 'Build — Elden Forge'}</title>
+	{#if build}
+		{@const desc = build.description ?? `Elden Ring build "${build.name}" by ${build.author_pseudo}. ${build.tags?.join(', ') ?? ''}`}
+		<meta name="description" content={desc.slice(0, 300)} />
+		<link rel="canonical" href={`https://eldenforge.fr/b/${build.id}`} />
+		<meta property="og:type" content="article" />
+		<meta property="og:url" content={`https://eldenforge.fr/b/${build.id}`} />
+		<meta property="og:title" content={`${build.name} — Elden Forge`} />
+		<meta property="og:description" content={desc.slice(0, 300)} />
+		<meta property="og:site_name" content="Elden Forge" />
+		<meta name="twitter:card" content="summary" />
+		<meta name="twitter:title" content={`${build.name} — Elden Forge`} />
+		<meta name="twitter:description" content={desc.slice(0, 200)} />
+		<script type="application/ld+json">
+			{JSON.stringify({
+				'@context': 'https://schema.org',
+				'@type': 'Article',
+				headline: build.name,
+				author: { '@type': 'Person', name: build.author_pseudo },
+				datePublished: build.created_at,
+				dateModified: build.updated_at,
+				description: desc.slice(0, 300),
+				url: `https://eldenforge.fr/b/${build.id}`,
+				keywords: build.tags?.join(', ') ?? '',
+				interactionStatistic: {
+					'@type': 'InteractionCounter',
+					interactionType: 'https://schema.org/LikeAction',
+					userInteractionCount: build.like_count
+				}
+			})}
+		</script>
+	{/if}
+</svelte:head>
 
 <div class="max-w-3xl mx-auto px-4 py-8">
 	{#if loading}
