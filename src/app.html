@@ -4,6 +4,57 @@
 		<meta charset="utf-8" />
 		<link rel="icon" href="%sveltekit.assets%/favicon.png" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<!-- SEO defaults (overridable per page via <svelte:head>) -->
+		<title>Elden Forge — Elden Ring build maker & community</title>
+		<meta
+			name="description"
+			content="Craft, save and share Elden Ring builds. Stats, equipment, spells, Shadow of the Erdtree content, live attack power computation and a community of tarnished."
+		/>
+		<meta name="theme-color" content="#0F0806" />
+		<meta name="robots" content="index, follow" />
+		<link rel="canonical" href="https://eldenforge.fr/" />
+
+		<!-- Open Graph -->
+		<meta property="og:site_name" content="Elden Forge" />
+		<meta property="og:type" content="website" />
+		<meta property="og:locale" content="en_US" />
+		<meta property="og:url" content="https://eldenforge.fr/" />
+		<meta property="og:title" content="Elden Forge — Elden Ring build maker & community" />
+		<meta
+			property="og:description"
+			content="Craft, save and share Elden Ring builds. Stats, equipment, spells, SotE content, live attack power and a community of tarnished."
+		/>
+		<meta property="og:image" content="https://eldenforge.fr/og-cover.jpg" />
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:title" content="Elden Forge — Elden Ring build maker" />
+		<meta
+			name="twitter:description"
+			content="Craft, save and share Elden Ring builds. Stats, equipment, spells and community."
+		/>
+		<meta name="twitter:image" content="https://eldenforge.fr/og-cover.jpg" />
+
+		<!-- Structured data : Website -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "WebSite",
+				"name": "Elden Forge",
+				"url": "https://eldenforge.fr/",
+				"description": "Elden Ring build maker and community — stats, equipment, spells, Shadow of the Erdtree content.",
+				"potentialAction": {
+					"@type": "SearchAction",
+					"target": {
+						"@type": "EntryPoint",
+						"urlTemplate": "https://eldenforge.fr/?search={search_term_string}"
+					},
+					"query-input": "required name=search_term_string"
+				}
+			}
+		</script>
+
 		<link rel="preconnect" href="https://fonts.googleapis.com" />
 		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 		<link
